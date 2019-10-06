@@ -16,7 +16,7 @@ export default {
     return new Promise((resolve, reject) => {
       console.log(post)
       axios
-        .post('https://pdftexapi.pythonanywhere.com/generate-pdf', post, {
+        .post('http://127.0.0.1:5000/generate-pdf', post, {
           responseType: 'arraybuffer'
         }, {
           headers: headers
@@ -39,7 +39,7 @@ export default {
     return new Promise((resolve, reject) => {
       console.log(post)
       axios
-        .post('https://pdftexapi.pythonanywhere.com/generate-tex', post, {
+        .post('http://127.0.0.1:5000/generate-tex', post, {
           responseType: 'arraybuffer'
         }, {
           headers: headers

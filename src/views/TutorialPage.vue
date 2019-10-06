@@ -50,68 +50,178 @@
             </loading>
           </div>
           <section
-            v-for="(question, index) in questions"
-            :key="index"
-            class="preview mt-5"
+            ref="math"
+            class="preview"
           >
-            <h2 class="secondary-heading mb-3 text-danger">Question {{ index + 1 }}: </h2>
-            <p>
-              Use the limit definition to find $ \frac{df}{dx} $
-              when $f(x) = {{ question.funct }}$
-            </p>
-            <section>
-              <div class="custom-control custom-switch mr-5 mt-5">
-                <input
-                  :id="question.answerSwitchId"
-                  v-model="question.answer.visibility"
-                  type="checkbox"
-                  class="custom-control-input"
-                  checked
-                >
-                <label
-                  :for="question.answerSwitchId"
-                  class="custom-control-label"
-                >Answer</label>
-              </div>
-              <div class="custom-control custom-switch">
-                <input
-                  :id="question.workingSwitchId"
-                  v-model="question.working.visibility"
-                  type="checkbox"
-                  class="custom-control-input"
-                >
-                <label
-                  :for="question.workingSwitchId"
-                  class="custom-control-label"
-                >Show working</label>
-              </div>
+            <section class="mb-5">
+              <v-form v-model="valid">
+                <v-container>
+                  <v-row>
+                    <v-col
+                      cols="12"
+                      md="12"
+                    >
+                      <v-select
+                        id="methods"
+                        :items="methods"
+                        v-model="method"
+                        label="Choose Method to use"
+                        style="line:"
+                        outlined
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col cols="12">
+                      <header>Sizes:</header>
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col
+                      cols="12"
+                      md="6"
+                    >
+                      <v-checkbox
+                        v-model="size2.visibility"
+                        label="2 x 2"
+                      />
+                    </v-col>
+                    <v-col
+                      v-show="size2.visibility"
+                      cols="12"
+                      md="6"
+                    >
+                      <v-text-field
+                        v-model="size2.total"
+                        type="number"
+                        label="Number of questions"
+                        required
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col
+                      cols="12"
+                      md="6"
+                    >
+                      <v-checkbox
+                        v-model="size3.visibility"
+                        label="3 x 3"
+                      />
+                    </v-col>
+                    <v-col
+                      v-show="size3.visibility"
+                      cols="12"
+                      md="6"
+                    >
+                      <v-text-field
+                        v-model="size3.total"
+                        type="number"
+                        label="Number of questions"
+                        required
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <v-col
+                      cols="12"
+                      md="6"
+                    >
+                      <v-checkbox
+                        v-model="size4.visibility"
+                        label="4 x 4"
+                      />
+                    </v-col>
+                    <v-col
+                      v-show="size4.visibility"
+                      cols="12"
+                      md="6"
+                    >
+                      <v-text-field
+                        v-model="size4.total"
+                        type="number"
+                        label="Number of questions"
+                        required
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row>
+                    <mdb-btn
+                      color="danger "
+                      @click.native="generateTutorial"
+                    >Generate Tutorial</mdb-btn>
+                  </v-row>
+                </v-container>
+              </v-form>
             </section>
-            <div
-              v-show="question.answer.visibility"
-              class="mt-5"
+            <section
+              v-show="tutorial"
+              v-for="(question, index) in questions"
+              :key="index"
+              class="preview mt-5"
             >
-              <h2 class="secondary-heading mb-3 text-primary">Answer: </h2>
-              <p>
+              <h2 class="secondary-heading mb-3 text-danger">Question {{ index + 1 }}: </h2>
+              <div class="lead mb-4">
                 <vue-mathjax
                   id="latex_funct"
-                  :formula="question.answer.value"
+                  :formula="question.question"
                   class="col-12"
                 />
-              </p>
-            </div>
-            <div
-              v-show="question.working.visibility"
-              id="working"
-              ref="working"
-              class="mt-5"
-            >
-              <h2 class="secondary-heading mb-3 text-primary">Solution: </h2>
-              <p
-                v-for="step in question.working.steps"
-                ref="steps"
-                :key="step"
-              >{{ step }} </p>
-            </div>
+              </div>
+              <section>
+                <div class="custom-control custom-switch mr-5 mt-5">
+                  <input
+                    :id="question.answerSwitchId"
+                    v-model="question.answer.visibility"
+                    type="checkbox"
+                    class="custom-control-input"
+                    checked
+                  >
+                  <label
+                    :for="question.answerSwitchId"
+                    class="custom-control-label"
+                  >Answer</label>
+                </div>
+                <div class="custom-control custom-switch">
+                  <input
+                    :id="question.workingSwitchId"
+                    v-model="question.working.visibility"
+                    type="checkbox"
+                    class="custom-control-input"
+                  >
+                  <label
+                    :for="question.workingSwitchId"
+                    class="custom-control-label"
+                  >Show working</label>
+                </div>
+              </section>
+              <div
+                v-show="question.answer.visibility"
+                class="mt-5"
+              >
+                <h2 class="secondary-heading mb-3 text-primary">Answer: </h2>
+                <p>
+                  <vue-mathjax
+                    id="latex_funct"
+                    :formula="question.answer.value"
+                    class="col-12"
+                  />
+                </p>
+              </div>
+              <div
+                v-show="question.working.visibility"
+                id="working"
+                ref="working"
+                class="mt-5"
+              >
+                <h2 class="secondary-heading mb-3 text-primary">Solution: </h2>
+                <p
+                  v-for="step in question.working.steps"
+                  ref="steps"
+                  :key="step"
+                >{{ step }} </p>
+              </div>
+            </section>
           </section>
         </section>
       </mdb-col>
@@ -148,9 +258,7 @@ import {  mdbContainer, mdbRow, mdbBtn, mdbCol, mdbModal, mdbModalHeader,
 import Loading from 'vue-loading-overlay'
 import 'vue-loading-overlay/dist/vue-loading.css'
 import { SemipolarSpinner } from 'epic-spinners'
-import {
-  evaluate, parse
-} from 'mathjs'
+import { multiply } from 'mathjs'
 
 export default {
   name: 'TutorialPage',
@@ -176,29 +284,145 @@ export default {
       isLoading: true,
       fullPage: true,
       questions: [],
-      json_questions: []
+      methods: ['Doolitle Factorisation', 'Crout Factorisation', 'Naive Gaussian Elimination', 'Mixed'],
+      method: 'Mixed',
+      size2: { visibility: true, total: 5 },
+      size3: { visibility: true, total: 5 },
+      size4: { visibility: true, total: 5 },
+      tutorial: false
     }
   },
   created () {
     this.renderMathJax()
   },
-  mounted: function () {
-    for (var i = 0; i < 25; i++) {
-      this.questions.push(this.generateQuestion(i))
+  watch: {
+    method () {
+      this.hideTutorial()
+    },
+    'size2.visibility' () {
+      this.hideTutorial()
+    },
+    'size3.visibility' () {
+      this.hideTutorial()
+    },
+    'size4.visibility' () {
+      this.hideTutorial()
     }
-    this.renderMathJax()
+  },
+  mounted: function () {
     this.toggleLoader(false)
   },
   methods: {
-    savePdf () {
-      let jsonData = {
-        author: 'https://limits.surge.sh',
-        title: 'Limits',
-        project: 'Limits',
-        'questions': this.generateJsonQuestion(this.questions)
+    generateTutorial () {
+      this.questions = []
+      if (this.size2.visibility) {
+        for (var i = 0; i < this.size2.total; i++) {
+          this.questions.push(this.generateQuestionAndSolution(i, 2, this.method))
+        }
       }
-      console.log(jsonData)
-      this.$store.dispatch('post/donwloadTutorialPdf', jsonData).then(response => {
+      if (this.size3.visibility) {
+        for (var i = 0; i < this.size3.total; i++) {
+          this.questions.push(this.generateQuestionAndSolution(i, 3, this.method))
+        }
+      }
+      if (this.size3.visibility) {
+        for (var i = 0; i < this.size4.total; i++) {
+          this.questions.push(this.generateQuestionAndSolution(i, 4, this.method))
+        }
+      }
+      this.showTutorial()
+      this.renderMathJax()
+      this.toggleLoader(false)
+    },
+    generateQuestionAndSolution (index, size, method) {
+      let question = {
+        question: undefined,
+        method: undefined,
+        n: undefined,
+        matrix: undefined,
+        working: { visibility: false, steps: [] },
+        answer: { visibility: false, value: undefined },
+        answerSwitchId: 'answerSwitch' + index,
+        workingSwitchId: 'workingSwitch' + index
+      }
+      question.n = size
+      if (method === 'Mixed') {
+        question.method = this.methods[Math.round(Math.random())]
+      } else {
+        question.method = method
+      }
+
+      question = this.generateQuestion(question)
+      question = this.solve(question)
+      return question
+    },
+    generateQuestion (question) {
+      if (question.method === 'Doolitle Factorisation') {
+        question.matrix = this.generateDoolitleA(question.n)
+      } else if (question.method === 'Crout Factorisation') {
+        question.matrix = this.generateCroutA(question.n)
+      }
+      question.question = `
+      Use the ${question.method} to find the $ LU $ factorisation of the matrix $ A $ in which $L$ is a unit lower
+      triangular matrix and $U$ is an upper triangular matrix
+      $$
+      \\begin{equation*}
+        A = ${this.matrixToLatex(question.matrix)}`
+      question.question = question.question.concat(`
+      \\end{equation*}
+      $$`)
+      return question
+    },
+    savePdf () {
+      let text = ` 
+      \\documentclass[fleqn]{article}
+      \\usepackage{amsmath} 
+      \\setlength{\\mathindent}{0pt} 
+      \\topmargin -.5in
+      \\textheight 9in
+      \\oddsidemargin -.25in
+      \\evensidemargin -.25in
+      \\textwidth 7in
+
+      %opening 
+      \\title{Limits}
+      \\author{https://limits.surge.sh}
+      \\date{ \\today}
+      \\begin{document} 
+      \\maketitle
+      \\section*{Questions}
+      \\noindent
+      \\begin{enumerate}
+      `
+      this.questions.forEach((question, i) => {
+        text += `      
+        \\item ${question.question.replace(/\$/g, '')} \\\\
+      `
+      })
+      text += `
+      \\end{enumerate}
+      \\section*{Solutions}
+      \\begin{enumerate}`
+      this.questions.forEach((question, i) => {
+        text += `
+        \\item{
+         ${question.answer.value.replace(/\$/g, '')}
+        \\subsection*{Working}
+        \\noindent
+        `
+        question.working.steps.forEach((step, index) => {
+          text = text + step.replace(/\$/g, '')
+        })
+        text = text + `}`
+      })
+      text = text + `
+      \\end{enumerate}
+      \\end{document}
+      `
+      let jsonData = {
+        latex: text
+      }
+      this.$store.dispatch('post/donwloadPdf', jsonData).then(response => {
         let url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))
         let fileLink = document.createElement('a')
         fileLink.href = url
@@ -213,40 +437,67 @@ export default {
       })
     },
     saveTex () {
+      let text = ` 
+      \\documentclass[fleqn]{article}
+      \\usepackage{amsmath} 
+      \\setlength{\\mathindent}{0pt} 
+      \\topmargin -.5in
+      \\textheight 9in
+      \\oddsidemargin -.25in
+      \\evensidemargin -.25in
+      \\textwidth 7in
+
+      %opening 
+      \\title{Limits}
+      \\author{https://limits.surge.sh}
+      \\date{ \\today}
+      \\begin{document} 
+      \\maketitle
+      \\section*{Questions}
+      \\noindent
+      \\begin{enumerate}
+      `
+      this.questions.forEach((question, i) => {
+        text += `      
+        \\item Use the limit definition to find $\\frac{df}{dx}$ when $f(x) = ${question.funct}$ \\\\
+      `
+      })
+      text += `
+      \\end{enumerate}
+      \\section*{Solutions}
+      \\begin{enumerate}`
+      this.questions.forEach((question, i) => {
+        text += `
+        \\item ${question.answer.value}
+        \\subsection*{Working}
+        \\noindent
+        \\begin{align*} \n`
+        question.working.steps.forEach((step, index) => {
+          text = text + step
+        })
+        text += `\\end{align*}`
+      })
+      text = text + `
+      \\end{enumerate}
+      \\end{document}
+      `
       let jsonData = {
-        author: 'https://limits.surge.sh',
-        title: 'Limits',
-        project: 'Limits',
-        'questions': this.generateJsonQuestion(this.questions)
+        latex: text
       }
-      console.log(jsonData)
-      this.$store.dispatch('post/donwloadTutorialTex', jsonData).then(response => {
+      this.$store.dispatch('post/donwloadTex', jsonData).then(response => {
         let url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/tex' }))
         let fileLink = document.createElement('a')
         fileLink.href = url
-        fileLink.download = 'tutorial.tex'
+        fileLink.download = 'questionSolution.tex'
         document.body.appendChild(fileLink)
         fileLink.click()
       }, error => {
-        this.isServerSideValidated = error.response.data.message
+        this.isServerSideValidated = error.response
         if (!this.isServerSideValidated) {
           this.isServerSideValidated = 'Got nothing from server. Please contact your administrator'
         }
       })
     },
-    generateJsonQuestion (questions) {
-      let json = []
-      for (var i = 0; i < questions.length; i++) {
-        let question = {
-          function: questions[i].funct.toString(),
-          answer: questions[i].answer.value.toString(),
-          working: questions[i].working.steps.toString()
-        }
-        json.push(question)
-      }
-      return json
-    },
-
     toggleModal (title, message) {
       this.modalTitle = title
       this.modalMessage = message
@@ -261,837 +512,545 @@ export default {
     renderMathJax () {
       window.MathJax.Hub.Queue(['Typeset', window.MathJax.Hub, window.body])
     },
-    parseToTex (f) {
-      return parse(f).toTex()
-    },
-    niceDisplay (str) {
-      if (typeof (str) === 'string') {
-        str = str.replace(/1x/g, 'x').replace(/1h/g, 'h')
-      } else {
-        for (var i = 0; i < str.length; i++) {
-          str[i] = str[i].replace(/1x/g, 'x').replace(/1h/g, 'h')
+    solve (question) {
+      question.working.steps = []
+      let l = this.generateEmptyMatrix(question.n)
+      let u = this.generateEmptyMatrix(question.n)
+      if (question.method === 'Doolitle Factorisation') {
+        for (let i = 0; i < question.n; i++) {
+          for (let j = 0; j < question.n; j++) {
+            if (i === j) {
+              l[i][j] = '1'
+              u[i][j] = `u_{${i + 1},${j + 1}}`
+            } else if (i > j) {
+              l[i][j] = `l_{${i + 1},${j + 1}}`
+              u[i][j] = '0'
+            } else if (i < j) {
+              l[i][j] = '0'
+              u[i][j] = `u_{${i + 1},${j + 1}}`
+            }
+          }
+        }
+        question.working.steps.push(` Denote the L and U matrices by 
+        $$\\\\
+        \\begin{equation*}
+            L = ${this.matrixToLatex(l)}  \\hspace{0.35cm} and \\hspace{0.5cm} U = ${this.matrixToLatex(u)}
+        \\end{equation*}
+       $$`)
+        question.working.steps.push(`so that the equation $LU = A$ is represented as 
+        $$\\\\
+        \\begin{equation*}
+            ${this.matrixToLatex(l)}${this.matrixToLatex(u)} = ${this.matrixToLatex(question.matrix)}
+        \\end{equation*}
+       $$`)
+        let temp = []
+        for (let i = 0; i < question.n; i++) {
+          for (let k = 0; k < question.n; k++) {
+            let str = ''
+            for (let j = 0; j < question.n; j++) {
+              if (u[j][k] !== '0' && l[i][j] !== '0') {
+                if (str === '') {
+                  if (l[k][j] === '1') {
+                    str = str + `${u[j][i]}`
+                  } else {
+                    str = str + `${u[j][i]} ${l[k][j]}`
+                  }
+                } else {
+                  if (l[k][j] === '1') {
+                    str = str + `+${u[j][i]}`
+                  } else {
+                    str = str + `+${u[j][i]} ${l[k][j]}`
+                  }
+                }
+              }
+            }
+            temp.push(str)
+          }
+        }
+        let arr = []
+        for (let k = 0; k < question.n; k++) {
+          for (let j = 0; j < question.n; j++) {
+            arr.push(question.matrix[j][k])
+          }
+        }
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i] !== '') {
+            temp[i] = temp[i] + `&=${arr[i]}`
+          }
+        }
+        question.working.steps.push(`Multiplying the matrix equation and solving for the unknowns in succession gives`)
+        if (question.n === 2) {
+          u[0][0] = question.matrix[0][0]
+          u[0][1] = question.matrix[0][1]
+          for (let i = 0; i < temp.length; i++) {
+            if (temp[i] !== '') {
+              if (i === 0) {
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\end{align*}$$`)
+              } else if (i === 1) {
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ l_{2,1} = ${question.matrix[1][0] / question.matrix[0][0]} \\end{align*}$$`)
+                l[1][0] = question.matrix[1][0] / question.matrix[0][0]
+              } else if (i === 2) {
+                question.working.steps.push(`$$\\begin{align*} ${temp[i]} \\end{align*}$$`)
+              } else if (i === 3) {
+                question.working.steps.push(`$$\\begin{align*} ${temp[i]} \\\\
+                  ${question.matrix[0][1]}\\cdot${question.matrix[1][0] / question.matrix[0][0]} + u_{2,2} &= ${question.matrix[1][1]} \\\\
+                  u_{2,2} &= ${question.matrix[1][1] - question.matrix[0][1] * question.matrix[1][0] / question.matrix[0][0]}
+                \\end{align*}$$`)
+                u[1][1] = question.matrix[1][1] - question.matrix[0][1] * question.matrix[1][0] / question.matrix[0][0]
+              }
+            }
+          }
+        } else if (question.n === 3) {
+          u[0][0] = question.matrix[0][0]
+          u[0][1] = question.matrix[0][1]
+          u[0][2] = question.matrix[0][2]
+          for (let i = 0; i < temp.length; i++) {
+            if (temp[i] !== '') {
+              if (i === 0 || i === 3 || i === 6) {
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\end{align*}$$`)
+              } else if (i === 1) {
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ l_{2,1} &= ${question.matrix[1][0] / question.matrix[0][0]} 
+                \\end{align*}$$`)
+                l[1][0] = question.matrix[1][0] / question.matrix[0][0]
+              } else if (i === 2) {
+                question.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\ l_{3,1} &= ${question.matrix[2][0] / question.matrix[0][0]} 
+                \\end{align*}$$`)
+                l[2][0] = question.matrix[2][0] / question.matrix[0][0]
+              } else if (i === 4) {
+                question.working.steps.push(`$$  \\begin{align*} ${temp[i]} \\\\
+                  ${u[0][1]} \\cdot ${l[1][0]} + u_{2,2} &= ${question.matrix[1][1]} \\\\
+                  u_{2,2} &= ${question.matrix[1][1] - u[0][1] * l[1][0]} 
+                \\end{align*}$$`)
+                u[1][1] = question.matrix[1][1] - u[0][1] * l[1][0]
+              } else if (i === 5) {
+                let lhs = question.matrix[2][1]
+                question.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\
+                  ${u[0][1]} \\cdot${l[2][0]} + ${u[1][1]}\\cdot l_{3,2} &= ${lhs} \\\\
+                  ${u[1][1]} \\cdot l_{3,2} &= ${lhs - u[0][1] * l[2][0]} \\\\
+                  l_{3,2} &= ${(lhs - u[0][1] * l[2][0]) / u[1][1]}
+                \\end{align*}$$`)
+                l[2][1] = (lhs - u[0][1] * l[2][0]) / u[1][1]
+              } else if (i === 7) {
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\
+                  ${u[0][2]} \\cdot \\ ${l[1][0]} + u_{2,3} &= ${question.matrix[1][2]} \\\\
+                  u_{2,3} &= ${question.matrix[1][2] - u[0][2] * l[1][0]} 
+                \\end{align*}$$`)
+                u[1][2] = question.matrix[1][2] - u[0][2] * l[1][0]
+              } else {
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\  
+                ${u[0][2]} \\cdot ${l[2][0]} + ${u[1][2]} \\cdot ${l[2][1]} + u_{3,3} &= ${question.matrix[2][2]} \\\\
+                u_{3,3} &= ${question.matrix[2][2] - u[0][2] * l[2][0] - u[1][2] * l[2][1]}
+                \\end{align*}$$`)
+                u[2][2] = question.matrix[2][2] - u[0][2] * l[2][0] - u[1][2] * l[2][1]
+              }
+            }
+          }
+        } else if (question.n === 4) {
+          u[0][0] = question.matrix[0][0]
+          u[0][1] = question.matrix[0][1]
+          u[0][2] = question.matrix[0][2]
+          u[0][3] = question.matrix[0][3]
+          for (let i = 0; i < temp.length; i++) {
+            if (temp[i] !== '') {
+              if (i === 0 || i === 4 || i === 8 || i === 12) {
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\end{align*} $$`)
+              } else if (i === 1) {
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ l_{2,1} &= ${question.matrix[1][0] / question.matrix[0][0]} 
+                \\end{align*}$$`)
+                l[1][0] = question.matrix[1][0] / question.matrix[0][0]
+              } else if (i === 2) {
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ l_{3,1} &= ${question.matrix[2][0] / question.matrix[0][0]} \\end{align*}$$`)
+                l[2][0] = question.matrix[2][0] / question.matrix[0][0]
+              } else if (i === 3) {
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ l_{4,1} &= ${question.matrix[3][0] / question.matrix[0][0]} \\end{align*}$$`)
+                l[3][0] = question.matrix[3][0] / question.matrix[0][0]
+              } else if (i === 5) {
+                question.working.steps.push(`$$  \\begin{align*} ${temp[i]} \\\\
+                  ${u[0][1]} \\cdot ${l[1][0]} + u_{2,2} &= ${question.matrix[1][1]} \\\\
+                  u_{2,2} &= ${question.matrix[1][1] - u[0][1] * l[1][0]} 
+                \\end{align*}$$`)
+                u[1][1] = question.matrix[1][1] - u[0][1] * l[1][0]
+              } else if (i === 6) {
+                let lhs = question.matrix[2][1]
+                question.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\
+                  ${u[0][1]} \\cdot ${l[2][0]} + ${u[1][1]}\\cdot l_{3,2} &= ${lhs} \\\\
+                  ${u[1][1]} \\cdot l_{3,2} &= ${lhs - u[0][1] * l[2][0]} \\\\
+                  l_{3,2} &= ${(lhs - u[0][1] * l[2][0]) / u[1][1]} 
+                \\end{align*}$$`)
+                l[2][1] = (lhs - u[0][1] * l[2][0]) / u[1][1]
+              } else if (i === 7) {
+                let lhs = question.matrix[3][1]
+                question.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\
+                  ${u[0][1]} \\cdot ${l[3][0]} + ${u[1][1]}\\cdot l_{4,2} &= ${lhs} \\\\
+                  ${u[1][1]} \\cdot l_{4,2} &= ${lhs - u[0][1] * l[3][0]} \\\\
+                  l_{4,2} &= ${(lhs - u[0][1] * l[3][0]) / u[1][1]} 
+                \\end{align*}$$`)
+                l[3][1] = (lhs - u[0][1] * l[3][0]) / u[1][1]
+              } else if (i === 9) {
+                question.working.steps.push(`$$  \\begin{align*} ${temp[i]} \\\\
+                  ${u[0][2]} \\cdot ${l[1][0]} + u_{2,3} &= ${question.matrix[1][2]} \\\\
+                  u_{2,3} &= ${question.matrix[1][2] - u[0][2] * l[1][0]}
+                \\end{align*}$$`)
+                u[1][2] = question.matrix[1][2] - u[0][2] * l[1][0]
+              } else if (i === 10) {
+                let lhs = question.matrix[2][2]
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                 ${u[0][2]} \\cdot ${l[2][0]} + ${u[1][2]} \\cdot ${l[2][1]} + u_{3,3} = ${lhs} \\\\
+                u_{3,3} = ${lhs - u[0][2] * l[2][0] - u[1][2] * l[2][1]}
+                \\end{align*}$$`)
+                u[2][2] = lhs - u[0][2] * l[2][0] - u[1][2] * l[2][1]
+              } else if (i === 11) {
+                let lhs = question.matrix[3][2]
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                 ${u[0][2]} \\cdot ${l[3][0]} + ${u[1][2]} \\cdot ${l[3][1]} + ${u[2][2]} \\cdot l_{4,3} &= ${lhs} \\\\
+                ${u[2][2]} \\cdot l_{4,3} &= ${lhs - u[0][2] * l[3][0] - u[1][2] * l[3][1]} \\\\
+                l_{4,3} &= ${(lhs - u[0][2] * l[3][0] - u[1][2] * l[3][1]) / u[2][2]}
+                \\end{align*}$$`)
+                l[3][2] = (lhs - u[0][2] * l[3][0] - u[1][2] * l[3][1]) / u[2][2]
+              } else if (i === 13) {
+                question.working.steps.push(`$$  \\begin{align*} ${temp[i]} \\\\
+                  ${u[0][3]} \\cdot ${l[1][0]} + u_{2,4} &= ${question.matrix[1][1]} \\\\
+                  u_{2,4} &= ${question.matrix[1][3] - u[0][3] * l[1][0]} 
+                \\end{align*}$$`)
+                u[1][3] = question.matrix[1][3] - u[0][3] * l[1][0]
+              } else if (i === 14) {
+                let lhs = question.matrix[2][3]
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                 ${u[0][3]} \\cdot ${l[2][0]} + ${u[1][3]} \\cdot ${l[2][1]} + u_{3,4} &= ${lhs} \\\\
+                u_{3,4} &= ${lhs - u[0][3] * l[2][0] - u[1][3] * l[2][1]}
+                \\end{align*}$$`)
+                u[2][3] = lhs - u[0][3] * l[2][0] - u[1][3] * l[2][1]
+              } else if (i === 15) {
+                let lhs = question.matrix[3][3]
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                 ${u[0][3]} \\cdot ${l[3][0]} + ${u[1][3]} \\cdot ${l[3][2]} + ${u[2][3]} \\cdot ${l[3][2]}+ u_{4,4} &= ${lhs} \\\\
+                u_{4,4} &= ${lhs - u[0][3] * l[3][0] - u[1][3] * l[3][1] - u[2][3] * l[3][2]}
+                \\end{align*}$$`)
+                u[3][3] = lhs - u[0][3] * l[3][0] - u[1][3] * l[3][1] - u[2][3] * l[3][2]
+              }
+            }
+          }
+        }
+      } else if (question.method === 'Crout Factorisation') {
+        for (let i = 0; i < question.n; i++) {
+          for (let j = 0; j < question.n; j++) {
+            if (i === j) {
+              u[i][j] = '1'
+              l[i][j] = `l_{${i + 1},${j + 1}}`
+            } else if (i > j) {
+              l[i][j] = `l_{${i + 1},${j + 1}}`
+              u[i][j] = '0'
+            } else if (i < j) {
+              l[i][j] = '0'
+              u[i][j] = `u_{${i + 1},${j + 1}}`
+            }
+          }
+        }
+        question.working.steps.push(` Denote the L and U matrices by 
+        $$\\\\
+        \\begin{equation*}
+            L = ${this.matrixToLatex(l)}  \\hspace{0.35cm} and \\hspace{0.5cm} U = ${this.matrixToLatex(u)}
+        \\end{equation*}
+       $$`)
+        question.working.steps.push(`so that the equation $LU = A$ is represented as 
+        $$\\\\
+        \\begin{equation*}
+            ${this.matrixToLatex(l)}${this.matrixToLatex(u)} = ${this.matrixToLatex(question.matrix)}
+        \\end{equation*}
+       $$`)
+        let temp = []
+        for (let i = 0; i < question.n; i++) {
+          for (let k = 0; k < question.n; k++) {
+            let str = ''
+            for (let j = 0; j < question.n; j++) {
+              if (u[j][k] !== '0' && l[i][j] !== '0') {
+                if (str === '') {
+                  if (u[j][i] === '1') {
+                    str = str + `${l[k][j]}`
+                  } else {
+                    str = str + `${u[j][i]} ${l[k][j]}`
+                  }
+                } else {
+                  if (u[j][i] === '1') {
+                    str = str + `+${l[k][j]}`
+                  } else {
+                    str = str + `+${u[j][i]} ${l[k][j]}`
+                  }
+                }
+              }
+            }
+            temp.push(str)
+          }
+        }
+        let arr = []
+        for (let k = 0; k < question.n; k++) {
+          for (let j = 0; j < question.n; j++) {
+            arr.push(question.matrix[j][k])
+          }
+        }
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i] !== '') {
+            temp[i] = temp[i] + `&=${arr[i]}`
+          }
+        }
+        question.working.steps.push(`Multiplying the matrix equation and solving for the unknowns in succession gives`)
+        if (question.n === 2) {
+          l[0][0] = question.matrix[0][0]
+          l[1][0] = question.matrix[1][0]
+          for (let i = 0; i < temp.length; i++) {
+            if (temp[i] !== '') {
+              if (i === 0 || i === 1) {
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\end{align*}$$`)
+              } else if (i === 2) {
+                question.working.steps.push(`$$\\begin{align*} ${temp[i]} \\\\
+                ${l[0][0]} \\cdot u_{1,2} &= ${question.matrix[0][1]} \\\\
+                u_{1,2} &= ${question.matrix[0][1] / l[0][0]}
+                \\end{align*}$$`)
+                u[0][1] = question.matrix[0][1] / l[0][0]
+              } else if (i === 3) {
+                question.working.steps.push(`$$\\begin{align*} ${temp[i]} \\\\
+                  ${u[0][1]}\\cdot${l[1][0]} + l_{2,2} &= ${question.matrix[1][1]} \\\\
+                  l_{2,2} &= ${question.matrix[1][1] - u[0][1] * l[1][0]}
+                \\end{align*}$$`)
+                l[1][1] = question.matrix[1][1] - u[0][1] * l[1][0]
+              }
+            }
+          }
+        } else if (question.n === 3) {
+          l[0][0] = question.matrix[0][0]
+          l[1][0] = question.matrix[1][0]
+          l[2][0] = question.matrix[1][0]
+          for (let i = 0; i < temp.length; i++) {
+            if (temp[i] !== '') {
+              if (i === 0 || i === 1 || i === 2) {
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\end{align*}$$`)
+              } else if (i === 3) {
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]}  \\\\
+                ${l[0][0]} \\cdot u_{1,2} &= ${question.matrix[0][1]} \\\\
+                u_{1,2} &= ${question.matrix[0][1] / l[0][0]} 
+                \\end{align*}$$`)
+                u[0][1] = question.matrix[0][1] / l[0][0]
+              } else if (i === 4) {
+                question.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\ 
+                ${u[0][1]} \\cdot ${l[1][0]} + l_{2,2} &= ${question.matrix[1][1]} \\\\
+                l_{2,2} &= ${question.matrix[1][1] - u[0][1] * l[1][0]}
+                \\end{align*}$$`)
+                l[1][1] = question.matrix[1][1] - u[0][1] * l[1][0]
+              } else if (i === 5) {
+                question.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\ 
+                ${u[0][1]} \\cdot ${l[2][0]} + l_{3,2} &= ${question.matrix[2][1]} \\\\
+                l_{3,2} &= ${question.matrix[2][1] - u[0][1] * l[2][0]}
+                \\end{align*}$$`)
+                l[2][1] = question.matrix[2][1] - u[0][1] * l[2][0]
+              } else if (i === 6) {
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]}  \\\\
+                ${l[0][0]} \\cdot u_{1,3} &= ${question.matrix[0][2]} \\\\
+                u_{1,3} &= ${question.matrix[0][2] / l[0][0]} 
+                \\end{align*}$$`)
+                u[0][2] = question.matrix[0][2] / l[0][0]
+              } else if (i === 7) {
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\
+                  ${u[0][2]} \\cdot \\ ${l[1][0]} + ${l[1][1]} \\cdot u_{2,3} &= ${question.matrix[1][2]} \\\\
+                  ${l[1][1]} \\cdot u_{2,3} &= ${question.matrix[1][2] - u[0][2] * l[1][0]} \\\\
+                  u_{2,3} &= ${(question.matrix[1][2] - u[0][2] * l[1][0]) / l[1][1]} 
+                \\end{align*}$$`)
+                u[1][2] = (question.matrix[1][2] - u[0][2] * l[1][0]) / l[1][1]
+              } else {
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\  
+                ${u[0][2]} \\cdot ${l[2][0]} + ${u[1][2]} \\cdot ${l[2][1]} + u_{3,3} &= ${question.matrix[2][2]} \\\\
+                l_{3,3} &= ${question.matrix[2][2] - u[0][2] * l[2][0] - u[1][2] * l[2][1]}
+                \\end{align*}$$`)
+                l[2][2] = question.matrix[2][2] - u[0][2] * l[2][0] - u[1][2] * l[2][1]
+              }
+            }
+          }
+        } else if (question.n === 4) {
+          l[0][0] = question.matrix[0][0]
+          l[1][0] = question.matrix[1][0]
+          l[2][0] = question.matrix[2][0]
+          l[3][0] = question.matrix[3][0]
+          for (let i = 0; i < temp.length; i++) {
+            if (temp[i] !== '') {
+              if (i === 0 || i === 1 || i === 2 || i === 3) {
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\end{align*} $$`)
+              } else if (i === 4) {
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                u_{1,2} &= ${question.matrix[0][1] / l[0][0]}
+                \\end{align*}$$`)
+                u[0][1] = question.matrix[0][1] / l[0][0]
+              } else if (i === 5) {
+                question.working.steps.push(`$$  \\begin{align*} ${temp[i]} \\\\
+                  ${u[0][1]} \\cdot ${l[1][0]} + l_{2,2} &= ${question.matrix[1][1]} \\\\
+                  l_{2,2} &= ${question.matrix[1][1] - u[0][1] * l[1][0]} 
+                \\end{align*}$$`)
+                l[1][1] = question.matrix[1][1] - u[0][1] * l[1][0]
+              } else if (i === 6) {
+                let lhs = question.matrix[2][1]
+                question.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\
+                  ${u[0][1]} \\cdot ${l[2][0]} + l_{3,2} &= ${lhs} \\\\
+                  l_{3,2} &= ${lhs - u[0][1] * l[2][0]} \\\\
+                \\end{align*}$$`)
+                l[2][1] = (lhs - u[0][1] * l[2][0])
+              } else if (i === 7) {
+                let lhs = question.matrix[3][1]
+                question.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\
+                  ${u[0][1]} \\cdot ${l[3][0]} + l_{4,2} &= ${lhs} \\\\
+                  l_{4,2} &= ${lhs - u[0][1] * l[3][0]} \\\\ 
+                \\end{align*}$$`)
+                l[3][1] = (lhs - u[0][1] * l[3][0])
+              } else if (i === 8) {
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                u_{1,3} &= ${question.matrix[0][2] / l[0][0]}
+                \\end{align*}$$`)
+                u[0][2] = question.matrix[0][2] / l[0][0]
+              } else if (i === 9) {
+                question.working.steps.push(`$$  \\begin{align*} ${temp[i]} \\\\
+                  ${u[0][2]} \\cdot ${l[1][0]} + u_{2,3} \\cdot ${l[1][1]} &= ${question.matrix[1][2]} \\\\
+                  ${l[1][1]} \\cdot  u_{2,3} &= ${question.matrix[1][2] - u[0][2] * l[1][0]} \\\\
+                  u_{2,3} &= ${(question.matrix[1][2] - u[0][2] * l[1][0]) / l[1][1]}
+                \\end{align*}$$`)
+                u[1][2] = (question.matrix[1][2] - u[0][2] * l[1][0]) / l[1][1]
+              } else if (i === 10) {
+                let lhs = question.matrix[2][2]
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                 ${u[0][2]} \\cdot ${l[2][0]} + ${u[1][2]} \\cdot ${l[2][1]} + l_{3,3} = ${lhs} \\\\
+                l_{3,3} = ${lhs - u[0][2] * l[2][0] - u[1][2] * l[2][1]}
+                \\end{align*}$$`)
+                l[2][2] = lhs - u[0][2] * l[2][0] - u[1][2] * l[2][1]
+              } else if (i === 11) {
+                let lhs = question.matrix[3][2]
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                 ${u[0][2]} \\cdot ${l[3][0]} + ${u[1][2]} \\cdot ${l[3][1]} + l_{4,3} &= ${lhs} \\\\
+                l_{4,3} &= ${lhs - u[0][2] * l[3][0] - u[1][2] * l[3][1]} \\\\
+                \\end{align*}$$`)
+                l[3][2] = lhs - u[0][2] * l[3][0] - u[1][2] * l[3][1]
+              } else if (i === 12) {
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                u_{1,4} &= ${question.matrix[0][3] / l[0][0]}
+                \\end{align*}$$`)
+                u[0][3] = question.matrix[0][3] / l[0][0]
+              } else if (i === 13) {
+                question.working.steps.push(`$$  \\begin{align*} ${temp[i]} \\\\
+                  ${u[0][3]} \\cdot ${l[1][0]} + ${l[1][1]} \\cdot u_{2,4} &= ${question.matrix[1][3]} \\\\
+                  ${l[1][1]} \\cdot u_{2,4} &= ${question.matrix[1][3] - u[0][3] * l[1][0]} \\\\
+                  u_{2,4} &= ${(question.matrix[1][3] - u[0][3] * l[1][0]) / l[1][1]}
+                \\end{align*}$$`)
+                u[1][3] = (question.matrix[1][3] - u[0][3] * l[1][0]) / l[1][1]
+              } else if (i === 14) {
+                let lhs = question.matrix[2][3]
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                ${u[0][3]} \\cdot ${l[2][0]} + ${u[1][3]} \\cdot ${l[2][1]} + ${l[2][2]}  \\cdot u_{3,4} &= ${lhs} \\\\
+                ${l[2][2]}  \\cdot u_{3,4} &= ${lhs - u[0][3] * l[2][0] - u[1][3] * l[2][1]} \\\\
+                u_{3,4} &= ${(lhs - u[0][3] * l[2][0] - u[1][3] * l[2][1]) / l[2][2]}
+                \\end{align*}$$`)
+                u[2][3] = (lhs - u[0][3] * l[2][0] - u[1][3] * l[2][1]) / l[2][2]
+              } else if (i === 15) {
+                let lhs = question.matrix[3][3]
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                 ${u[0][3]} \\cdot ${l[3][0]} + ${u[1][3]} \\cdot ${l[3][1]} + ${u[2][3]} \\cdot ${l[3][2]}+ l_{4,4} &= ${lhs} \\\\
+                l_{4,4} &= ${lhs - u[0][3] * l[3][0] - u[1][3] * l[3][1] - u[2][3] * l[3][2]}
+                \\end{align*}$$`)
+                l[3][3] = lhs - u[0][3] * l[3][0] - u[1][3] * l[3][1] - u[2][3] * l[3][2]
+              }
+            }
+          }
         }
       }
+
+      question.working.steps.push(`Therefore we have 
+        $$\\\\
+          \\begin{equation*}
+            L = ${this.matrixToLatex(l)} \\hspace{ 0.2cm } and \\hspace{ 0.2cm } U = ${this.matrixToLatex(u)}
+          \\end{equation*}
+       $$`)
+      question.answer.value = `
+        $$
+          \\begin{equation*}
+            L = ${this.matrixToLatex(l)}\\hspace{ 0.2cm } and \\hspace{ 0.2cm} U = ${this.matrixToLatex(u)}
+          \\end{equation*}
+        $$`
+      return question
+    },
+    generateEmptyMatrix (n) {
+      let emptyMatrix = []
+      for (let i = 0; i < n; i++) {
+        let row = Array(n - 1).fill(0)
+        emptyMatrix.push(row)
+      }
+      return emptyMatrix
+    },
+    generateDoolitleA (n) {
+      let l = this.generateMatrix(n)
+      let u = this.generateMatrix(n)
+      for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+          if (i === j) {
+            l[i][j] = 1
+          } else if (j > i) {
+            l[i][j] = 0
+          } else if (j < i) {
+            u[i][j] = 0
+          }
+        }
+      }
+      return multiply(l, u)
+    },
+    generateCroutA (n) {
+      let l = this.generateMatrix(n)
+      let u = this.generateMatrix(n)
+      for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+          if (i === j) {
+            u[i][j] = 1
+          } else if (i > j) {
+            u[i][j] = 0
+          } else if (j > i) {
+            l[i][j] = 0
+          }
+        }
+      }
+      return multiply(l, u)
+    },
+    getRandomInt (max) {
+      let int = Math.floor(Math.random() * Math.floor(max - 1) + 1)
+      let sign = Math.random()
+      if (sign === 1) {
+        return -1 * int
+      } else {
+        return int
+      }
+    },
+    generateMatrix (n) {
+      let matrix = []
+      for (let i = 0; i < n; i++) {
+        let t = []
+        for (let j = 0; j < n; j++) {
+          t.push(this.getRandomInt(9))
+        }
+        matrix.push(t)
+      }
+      return matrix
+    },
+    matrixToLatex (matrix) {
+      let str = `\\begin{pmatrix}`
+      for (let i = 0; i < matrix.length; i++) {
+        for (let j = 0; j < matrix[i].length; j++) {
+          if (j === 0) {
+            str = str.concat(matrix[i][j])
+          } else {
+            str = str.concat('&' + matrix[i][j])
+          }
+        }
+        str = str.concat('\\\\')
+      }
+      str = str.concat(`\\end{pmatrix}`)
       return str
     },
-    generateQuestion (index) {
-      let question = {
-        question: undefined,
-        working: { visibility: false, steps: [] },
-        answer: { visibility: false, value: undefined },
-        whichCase: undefined,
-        funct: undefined,
-        answerSwitchId: 'answerSwitch' + index,
-        workingSwitchId: 'workingSwitch' + index
-      }
-      question.whichCase = Math.floor(Math.random() * 23)
-      let a = Math.floor(Math.random() * 100 + 1)
-      let b = Math.floor(Math.random() * 100 + 1)
-      let c = Math.floor(Math.random() * 100 + 1)
-      if (question.whichCase === 0) {
-        question.funct = a.toString()
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + a.toString() +
-          ' - ' + a.toString() + '}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{0}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} 0$')
-        question.working.steps.push('$\\frac{df}{dx} = 0 $')
-        question.answer.value = '$\\frac{df}{dx} = 0 $'
-      } else if (question.whichCase === 1) {
-        question.funct = a + 'x' + '+' + b
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{[' + a.toString() +
-          '(x+h) + ' + b.toString() + '] - [' + a.toString() + 'x + ' +
-          b.toString() + ']}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + a.toString() +
-          'x + ' + a.toString() + 'h +' + b.toString() + '- ' + a.toString() + 'x - ' +
-          b.toString() + '}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + a.toString() + 'h}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} ' + a.toString() + '$')
-        question.working.steps.push('$\\frac{df}{dx} = ' + a.toString() + '$')
-        question.answer.value = '$\\frac{df}{dx} = ' + a.toString() + '$'
-      } else if (question.whichCase === 2) {
-        question.funct = b + '-' + a + 'x'
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{[' + b.toString() + '-' +
-          a.toString() + '(x+h)] - [' + b.toString() + '-' + a.toString() + 'x]}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + b.toString() + '-' +
-          a.toString() + 'x - ' + a.toString() + 'h -' + b.toString() + '+' +
-          a.toString() + 'x}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ -' + a.toString() + 'h}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} - ' + a.toString() + '$')
-        question.working.steps.push('$\\frac{df}{dx} = - ' + a.toString() + '$')
-        question.answer.value = '$\\frac{df}{dx} = - ' + a.toString() + '$'
-      } else if (question.whichCase === 3) {
-        question.funct = a + 'x^2' + '+' + b
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{[' + a.toString() +
-          '(x+h)^2 + ' + b.toString() + '] - [' + a.toString() + 'x^2 + ' +
-          b.toString() + ']}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{[' + a.toString() +
-          '(x^2+2xh+h^2) + ' + b.toString() + '] - [' + a.toString() + 'x^2 + ' +
-          b.toString() + ']}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{[' + a.toString() +
-          'x^2 + ' + a.toString() +
-          '\\cdot 2xh + ' + a.toString() +
-          '\\cdot h^2 + ' + b.toString() + '] - [' + a.toString() + 'x^2 + ' +
-          b.toString() + ']}{h}$')
-        let val = evaluate(a.toString() + '*2').toString()
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{[' + a.toString() +
-          'x^2 + ' + val +
-          'xh + ' + a.toString() +
-          'h^2+' + b.toString() + '] - [' + a.toString() + 'x^2 + ' +
-          b.toString() + ']}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + a.toString() +
-          'x^2 + ' + val +
-          'xh + ' + a.toString() +
-          'h^2 + ' + b.toString() + ' - ' + a.toString() + 'x^2 - ' +
-          b.toString() + '}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{(' + val +
-          'x + ' + a.toString() + 'h)h}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0}' + val +
-          'x + ' + a.toString() + 'h$')
-        question.working.steps.push('$\\frac{df}{dx} = ' + evaluate(a.toString() + '*2').toString() + 'x$')
-        question.answer.value = '$\\frac{df}{dx} = ' + evaluate(a.toString() + '*2').toString() + 'x$'
-      } else if (question.whichCase === 4) {
-        question.funct = b + '-' + a + 'x^2'
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{[' + b.toString() + '-' +
-          a.toString() + '(x+h)^2] - [' + b.toString() + '-' + a.toString() + 'x^2]}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{[' + b.toString() + ' -' +
-          a.toString() + '(x^2+2xh+h^2)] - [' + b.toString() + '-' + a.toString() + 'x^2]}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{[' + b.toString() + ' -' +
-          a.toString() + 'x^2 - ' +
-          a.toString() + '\\cdot 2xh - ' +
-          a.toString() + 'h^2] - [' +
-          b.toString() + '-' + a.toString() + 'x^2]}{h}$')
-        let val = evaluate(a.toString() + '*2')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{[' + b.toString() + ' -' +
-          a.toString() + 'x^2 - ' +
-          val + 'xh - ' +
-          a.toString() + 'h^2] - [' +
-          b.toString() + '-' + a.toString() + 'x^2]}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + b.toString() + ' -' +
-          a.toString() + 'x^2 - ' +
-          val + 'xh - ' +
-          a.toString() + 'h^2 - ' +
-          b.toString() + '+' + a.toString() + 'x^2}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{(-' +
-          val + 'x - ' +
-          a.toString() + 'h)h}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} -' +
-          val + 'x - ' +
-          a.toString() + 'h$')
-        question.working.steps.push('$\\frac{df}{dx} = -' + val + 'x$')
-        question.answer.value = '$\\frac{df}{dx} = -' + val + 'x$'
-      } else if (question.whichCase === 5) {
-        question.funct = a + 'x^2' + '+' + b + 'x'
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{[' + a.toString() +
-          '(x+h)^2 + ' + b.toString() + '(x+h)] - [' + a.toString() + 'x^2 + ' +
-          b.toString() + 'x]}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{[' + a.toString() +
-          '(x^2+2xh+h^2) + ' + b.toString() + '(x+h)] - [' + a.toString() + 'x^2 + ' +
-          b.toString() + 'x]}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{[' + a.toString() +
-          'x^2 + ' + a.toString() +
-          '\\cdot 2xh + ' + a.toString() +
-          'h^2 + ' +
-          b.toString() + 'x + ' + b.toString() + 'h] - [' +
-          a.toString() + 'x^2 + ' + b.toString() + 'x]}{h}$')
-        let val = evaluate(a.toString() + '*2')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + a.toString() +
-          'x^2 + ' + val + 'xh +' + a.toString() +
-          'h^2 + ' +
-          b.toString() + 'x + ' + b.toString() + 'h - ' +
-          a.toString() + 'x^2 - ' + b.toString() + 'x}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{(' + val + 'x +' + a.toString() +
-          'h+' + b.toString() + ')h}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} ' + val + 'x +' + a.toString() +
-          'h+' + b.toString() + '$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} ' + val + 'x +' + b.toString() + '$')
-        question.working.steps.push('$\\frac{df}{dx} = ' + val + 'x +' + b.toString() + '$')
-        question.answer.value = '$\\frac{df}{dx} = ' + val + 'x +' + b.toString() + '$'
-      } else if (question.whichCase === 6) {
-        question.funct = b + 'x-' + a + 'x^2'
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{[' + b.toString() + '(x+h)-' +
-          a.toString() + '(x+h)^2] - [' + b.toString() + '-' + a.toString() + 'x^2]}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{[' + b.toString() + '(x+h)-' +
-          a.toString() + '(x^2+2xh+h)] - [' + b.toString() + '-' + a.toString() + 'x^2]}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{[' + b.toString() + 'x +' +
-          b.toString() + 'h -' + a.toString() + 'x^2-' +
-          a.toString() + '\\cdot 2xh-' + a.toString() + 'h^2] - [' +
-          b.toString() + 'x-' + a.toString() + 'x^2]}{h}$')
-        let val = evaluate(a.toString() + '*2')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + b.toString() + 'x +' +
-          b.toString() + 'h -' + a.toString() + 'x^2-' +
-          val + 'xh-' + a.toString() + 'h^2 - ' +
-          b.toString() + 'x+' + a.toString() + 'x^2}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{(' +
-          b.toString() + ' -' + val + 'x-' + a.toString() + 'h)h }{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} ' +
-          b.toString() + ' -' + val + 'x-' + a.toString() + 'h$')
-        question.working.steps.push('$\\frac{df}{dx} = ' + b.toString() + ' -' + val + 'x$')
-        question.answer.value = '$\\frac{df}{dx} = ' + b.toString() + ' -' + val + 'x$'
-      } else if (question.whichCase === 7) {
-        question.funct = a + 'x^2+' + b +
-          'x+' + c
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{[' + a.toString() +
-          '(x+h)^2 + ' + b.toString() + '(x+h) + ' + c.toString() +
-          '] - [' + a.toString() + 'x^2 + ' + b.toString() + 'x' + c.toString() + ']}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{[' + a.toString() +
-          '(x^2+2xh+h^2) + ' + b.toString() + '(x+h) + ' + c.toString() + '] - [' + a.toString() + 'x^2 + ' +
-          b.toString() + 'x+' + c.toString() + ']}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{[' + a.toString() +
-          'x^2 + ' + a.toString() + '\\cdot 2xh + ' + a.toString() +
-          'h^2 + ' + b.toString() + 'x + ' + b.toString() + 'h + ' +
-          c.toString() + '] - [' + a.toString() + 'x^2 + ' + b.toString() +
-          'x + ' + c.toString() + ']}{h}$')
-        let val = evaluate(a.toString() + '*2')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + a.toString() +
-          'x^2 + ' + val + 'xh +' + a.toString() + 'h^2 + ' +
-          b.toString() + 'x + ' + b.toString() + 'h +' + c.toString() +
-          '-' + a.toString() + 'x^2  -' + b.toString() + 'x-' +
-          c.toString() + '}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{(' + val + 'x +' + a.toString() +
-          'h+' + b.toString() + ')h}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} ' + val + 'x +' + a.toString() +
-          'h+' + b.toString() + '$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} ' + val + 'x +' + b.toString() + '$')
-        question.working.steps.push('$\\frac{df}{dx} = ' + val + 'x +' + b.toString() + '$')
-        question.answer.value = '$\\frac{df}{dx} = ' + val + 'x +' + b.toString() + '$'
-      } else if (question.whichCase === 8) {
-        question.funct = a + 'x^3'
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + a.toString() +
-          '(x+h)^3 - ' + a.toString() + 'x^3}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + a.toString() +
-          '(x^3+3x^2h+3xh^2+h^3) - ' + a.toString() + 'x^3}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + a.toString() +
-          'x^3 + ' + a.toString() +
-          '\\cdot 3x^2h + ' + a.toString() +
-          '\\cdot 3xh^2 + ' + a.toString() +
-          'h^3 - ' + a.toString() + 'x^3}{h}$')
-        let val = evaluate(a.toString() + '*3')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{(' + val +
-          'x^2 + ' + val + 'xh + ' + a.toString() + 'x^2h)h}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0}' + val +
-          'x^2 + ' + val + 'xh + ' + a.toString() + 'x^2h$')
-        question.working.steps.push('$\\frac{df}{dx} = ' + val + 'x^2 $')
-        question.answer.value = '$\\frac{df}{dx} = ' + val + 'x^2 $'
-      } else if (question.whichCase === 9) {
-        question.funct = c + '/(' + a + 'x+' + b + ')'
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{\\left[\\frac{' + c.toString() + '}{' +
-          a + '(x+h)+' + b + '} \\right] - ' + '\\left[\\frac{' + c + '}{' + a + 'x+' +
-          b + '} \\right]' + '}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c.toString() +
-          '(' + a + 'x+' + b + ')-' + c + '(' + a + '(x+h)+' + b + ')}{h[(' +
-          a + '(x+h)+' + b + ')(' + a + 'x+' +
-          b + ')]' + '}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c.toString() +
-          '(' + a + 'x+' + b + ')-' + c + '(' + a + 'x+' +
-          a + 'h+' + b + ')}{h(' + a + '(x+h)+' + b + ')(' +
-          a + 'x+' + b + ')}$')
-        let valCxA = evaluate(a.toString() + '*' + c.toString())
-        let valCxB = evaluate(b.toString() + '*' + c.toString())
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + valCxA + 'x+' + valCxB +
-          '-' + valCxA + 'x-' + valCxA + 'h-' + valCxB + '}{h(' + a + '(x+h)+' + b + ')(' +
-          a + 'x+' + b + ')}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' +
-          valCxA + 'h}{h(' + a + '(x+h)+' + b + ')(' +
-          a + 'x+' + b + ')}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' +
-          valCxA + '}{(' + a + '(x+h)+' + b + ')(' +
-          a + 'x+' + b + ')}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{' +
-          valCxA + '}{(' + a + '(x+0)+' + b + ')(' +
-          a + 'x+' + b + ')}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{' +
-          valCxA + '}{(' + a + 'x+' + b + ')(' +
-          a + 'x+' + b + ')}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{' +
-          valCxA + '}{(' + a + 'x+' + b + ')^2}$')
-        question.answer.value = '$\\frac{df}{dx} =  \\frac{' +
-          valCxA + '}{(' + a + 'x+' + b + ')^2}$'
-      } else if (question.whichCase === 10) {
-        question.funct = c + '/(' + b + '-' + a + 'x)'
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{\\left[\\frac{' + c.toString() + '}{' +
-          b + '-' + a + '(x+h)} \\right] - ' + '\\left[\\frac{' + c + '}{' +
-          b + '-' + a + 'x' + '} \\right]' + '}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c.toString() + '(' +
-          b + '-' + a + 'x)-' + c.toString() + '(' + b + '-' + a +
-          '(x+h)) }{h[' + b + '-' + a + '(x+h)) (' + b + '-' + a + 'x)]}$')
-        let valCxA = evaluate(a.toString() + '*' + c.toString())
-        let valCxB = evaluate(b.toString() + '*' + c.toString())
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + valCxB + '-' + valCxA + 'x-' +
-          valCxB + '+' + valCxA + 'x+' + valCxA + 'h}{h[(' + b + '-' + a + '(x+h)) (' +
-          b + '-' + a + 'x)]}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + valCxA + 'h}{h[(' + b +
-          '-' + a + '(x+h)) (' + b + '-' + a + 'x)]}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + valCxA + '}{(' + b +
-          '-' + a + '(x+h)) (' + b + '-' + a + 'x)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\frac{' + valCxA + '}{(' + b +
-          '-' + a + '(x+0)) (' + b + '-' + a + 'x)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\frac{' + valCxA + '}{(' + b +
-          '-' + a + 'x)^2}$')
-        question.answer.value = '$\\frac{df}{dx} = \\frac{' + valCxA + '}{(' + b +
-          '-' + a + 'x)^2}$'
-      } else if (question.whichCase === 11) {
-        question.funct = c + 'x/(' + a + 'x+' + b + ')'
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{\\left[\\frac{' + c.toString() + '(x+h)}{' +
-          a + '(x+h)+' + b + '} \\right] - ' + '\\left[\\frac{' + c + 'x}{' + a + 'x+' +
-          b + '} \\right]' + '}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c.toString() +
-          '(x+h)(' + a + 'x+' + b + ')-' + c + 'x(' + a + 'x+' + b + ')}{h[(' +
-          a + '(x+h)+' + b + ')(' + a + 'x+' +
-          b + ')]' + '}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c.toString() +
-          '(x+h)(' + a + 'x+' + b + ')-' + c + 'x(' + a + 'x+' +
-          b + ')}{h[(' + a + '(x+h)+' + b + ')(' +
-          a + 'x+' + b + ')]}$')
-        let valCxA = evaluate(a.toString() + '*' + c.toString())
-        let valCxB = evaluate(b.toString() + '*' + c.toString())
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + valCxA + 'x^2+' + valCxB +
-          'x+' + valCxA + 'xh+' + valCxB + 'h-' + valCxA + 'x^2-' + valCxB + 'x}{h(' + a +
-          '(x+h)+' + b + ')(' + a + 'x+' + b + ')}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{(' + valCxA +
-          'x+' + valCxB + ')h}{h[(' + a +
-          '(x+h)+' + b + ')(' + a + 'x+' + b + ')]}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + valCxA +
-          'x+' + valCxB + '}{(' + a +
-          '(x+h)+' + b + ')(' + a + 'x+' + b + ')}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{' + valCxA +
-          'x+' + valCxB + '}{(' + a +
-          '(x+0)+' + b + ')(' + a + 'x+' + b + ')}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{' + valCxA +
-          'x+' + valCxB + '}{(' + a +
-          'x+' + b + ')(' + a + 'x+' + b + ')}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{' + valCxA +
-          'x+' + valCxB + '}{(' + a +
-          'x+' + b + ')^2}$')
-        question.answer.value = '$\\frac{df}{dx} =  \\frac{' + valCxA +
-          'x+' + valCxB + '}{(' + a +
-          'x+' + b + ')^2}$'
-      } else if (question.whichCase === 12) {
-        question.funct = a + '/x^2'
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{\\left[\\frac{' + a.toString() + '}{' +
-          '(x+h)^2} \\right] - ' + '\\left[\\frac{' + a + '}{x^2} \\right]}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + a.toString() + '(x+h) -' +
-          a.toString() + 'x}{ h[x(x+h)^2]}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + a.toString() + 'x+' +
-          a.toString() + 'h -' + a.toString() + 'x}{h[x(x+h)^2]}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' +
-          a.toString() + 'h}{h[x(x+h)^2]}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' +
-          a.toString() + '}{x(x+h)^2}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\frac{' +
-          a.toString() + '}{x(x+0)^2}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\frac{' +
-          a.toString() + '}{x^3}$')
-        question.answer.value = '$\\frac{df}{dx} = \\frac{' + a.toString() + '}{x^3}$'
-      } else if (question.whichCase === 13) {
-        question.funct = c + '/(' + a + 'x^2 + ' + b + ')'
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{\\left[\\frac{' + c.toString() + '}{' +
-          a + '(x+h)^2 +' + b + '} \\right] - ' + '\\left[\\frac{' + c + '}{ ' +
-          a + 'x^2+' + b + '} \\right]}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c.toString() + '[' +
-          a.toString() + '(x+h)^2 +' + b + ' - ' + a.toString() + 'x^2-' + b +
-          ']}{ h[(' + a + '(x+h)^2 +' + b + ')(' + a + 'x^2 +' + b + ')]}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c.toString() + '[' +
-          a.toString() + '(x^2+2xh+h^2) +' + b + ' - ' + a.toString() + 'x^2-' + b +
-          ']}{ h[(' + a + '(x+h)^2 +' + b + ')(' + a + 'x^2 +' + b + ')]}$')
-        let val = evaluate(a.toString() + '*2')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c.toString() + '[' +
-          a.toString() + 'x^2 +' + val + 'xh +' + a.toString() + 'h+' + b + ' - ' +
-          a.toString() + 'x^2-' + b + ']}{ h[(' + a + '(x+h)^2 +' +
-          b + ')(' + a + 'x^2 +' + b + ')]}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c.toString() + '[' +
-          val + 'x +' + a.toString() + ']h}{ h[(' + a + '(x+h)^2 +' +
-          b + ')(' + a + 'x^2 +' + b + ')]}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c.toString() + '[' +
-          val + 'x +' + a.toString() + ']}{ (' + a + '(x+h)^2 +' +
-          b + ')(' + a + 'x^2 +' + b + ')]}$')
-        let valCx2xA = evaluate(c.toString() + '*' + val)
-        let valCxA = evaluate(c.toString() + '*' + a.toString())
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + valCx2xA +
-          'x +' + valCxA + '}{ (' + a + '(x+h)^2 +' + b + ')(' +
-          a + 'x^2 +' + b + ')}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{' + valCx2xA +
-          'x +' + valCxA + '}{ (' + a + '(x+0)^2 +' + b + ')(' +
-          a + 'x^2 +' + b + ')}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{' + valCx2xA +
-          'x +' + valCxA + '}{ (' + a + 'x^2 +' + b + ')(' +
-          a + 'x^2 +' + b + ')}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{' + valCx2xA +
-          'x +' + valCxA + '}{ (' + a + 'x^2 +' + b + ')^2}$')
-        question.answer.value = '$\\frac{df}{dx} =  \\frac{' + valCx2xA +
-          'x +' + valCxA + '}{ (' + a + 'x^2 +' + b + ')^2}$'
-      } else if (question.whichCase === 14) {
-        question.funct = c + '/(' + b + '-' + a + 'x^2)'
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{\\left[\\frac{' + c.toString() + '}{' +
-          b.toString() + '-' + a.toString() + '(x+h)^2 } \\right] - ' + '\\left[\\frac{' + c.toString() + '}{ ' +
-          b.toString() + '-' + a.toString() + 'x^2} \\right]}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c.toString() + '[' +
-          b + '-' + a.toString() + 'x^2-' + b + '+' + a.toString() + '(x+h)^2 ' +
-          ']}{ h[(' + b + '-' + a + '(x+h)^2)(' + b + '-' + a + 'x^2)]}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c.toString() + '[' +
-          b + '-' + a.toString() + 'x^2 -' + b + '+' + a.toString() + '(x^2+2xh+h^2)' +
-          ']}{ h[(' + b + '-' + a + '(x+h)^2)(' + b + '-' + a + 'x^2)]}$')
-        let val = evaluate(a.toString() + '*2')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c.toString() + '[' +
-          b + '-' + a.toString() + 'x^2-' + b + '+' + a.toString() +
-          'x^2 +' + val + 'xh +' + a.toString() + 'h^2]}{ h[(' + b + '-' + a + '(x+h)^2' +
-          ')(' + b + '-' + a + 'x^2)]}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c.toString() + '[' +
-          val + 'x +' + a.toString() + 'h]h}{ h[(' + b + '-' + a + '(x+h)^2' +
-          ')(' + b + '-' + a + 'x^2)]}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c.toString() + '[' +
-          val + 'x +' + a.toString() + 'h]}{ (' + b + '-' + a + '(x+h)^2 +' +
-          ')(' + b + '-' + a + 'x^2 )]}$')
-        let valCx2xA = evaluate(c.toString() + '*' + val)
-        let valCxA = evaluate(c.toString() + '*' + a.toString())
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + valCx2xA +
-          'x +' + valCxA + 'h}{ (' + b + '-' + a + '(x+h)^2)(' +
-          b + '-' + a + 'x^2)}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{' + valCx2xA +
-          'x +' + valCxA + '\\cdot 0}{ (' + b + '-' + a + '(x+0)^2)(' +
-          b + '-' + a + 'x^2)}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{' + valCx2xA +
-          'x}{ (' + b + '-' + a + 'x^2)(' +
-          b + '-' + a + 'x^2)}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{' + valCx2xA +
-          'x}{ (' + b + '-' + a + 'x^2)^2}$')
-        question.answer.value = '$\\frac{df}{dx} =  \\frac{' + valCx2xA +
-          'x}{ (' + b + '-' + a + 'x^2)^2}$'
-      } else if (question.whichCase === 15) {
-        question.funct = a + '/sqrt(x)'
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{\\left[\\frac{' + a.toString() + '}{' +
-          '\\sqrt{x+h} } \\right] - ' + '\\left[\\frac{' + a.toString() + '}{ \\sqrt{x}} \\right]}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + a + '\\big(\\sqrt{x} - \\sqrt{x+h} \\big)}{' +
-          '[\\sqrt{x+h}\\sqrt{x}] h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + a + '\\big(\\sqrt{x} - \\sqrt{x+h} \\big)}{' +
-          '\\big(\\sqrt{x+h}\\sqrt{x}\\big)  h} \\cdot \\frac{\\big(\\sqrt{x} + \\sqrt{x+h} \\big)}{\\big(\\sqrt{x} + \\sqrt{x+h} \\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + a + '\\big(x - x- h \\big)}{' +
-          '\\big(\\sqrt{x+h}\\sqrt{x}\\big)\\big(\\sqrt{x} + \\sqrt{x+h} \\big)  h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{-' + a + '}{' +
-          '\\big(\\sqrt{x+h}\\sqrt{x}\\big)\\big(\\sqrt{x} + \\sqrt{x+h} \\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\frac{-' + a + '}{' +
-          '\\big(\\sqrt{x+0}\\sqrt{x}\\big)\\big(\\sqrt{x} + \\sqrt{x+0} \\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\frac{-' + a + '}{' +
-          'x\\big(2\\sqrt{x}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\frac{-' + a + '}{2\\sqrt[3]{x}}$')
-        question.answer.value = '$\\frac{df}{dx} = \\frac{-' + a + '}{2 \\sqrt[3]{x}}$'
-      } else if (question.whichCase === 16) {
-        question.funct = 'sqrt(' + a + 'x+' + b + ')'
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ \\sqrt{ ' +
-          a + '(x+h)+' + b + '}-\\sqrt{' + a + 'x+' + b + '}}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ \\sqrt{ ' +
-          a + '(x+h)+' + b + '}-\\sqrt{' + a + 'x+' + b +
-          '}}{h} \\cdot \\frac{\\sqrt{ ' + a + '(x+h)+' + b + '} + \\sqrt{' +
-          a + 'x+' + b + '}}{\\sqrt{ ' + a + '(x+h)+' + b + '}+\\sqrt{' +
-          a + 'x+' + b + '}}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ (' +
-          a + 'x+' + a + 'h+' + b + ')-(' + a + 'x+' + b +
-          ')}{h\\big(\\sqrt{ ' + a + '(x+h)+' + b + '}+\\sqrt{' +
-          a + 'x+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' +
-          a + 'x+' + a + 'h+' + b + '-' + a + 'x-' + b +
-          '}{h\\big(\\sqrt{ ' + a + '(x+h)+' + b + '}+\\sqrt{' +
-          a + 'x+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' +
-          a + 'h}{h\\big(\\sqrt{ ' + a + '(x+h)+' + b + '}+\\sqrt{' +
-          a + 'x+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' +
-          a + '}{\\sqrt{ ' + a + '(x+h)+' + b + '}+\\sqrt{' +
-          a + 'x+' + b + '}}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\frac{' +
-          a + '}{\\sqrt{ ' + a + '(x+0)+' + b + '}+\\sqrt{' +
-          a + 'x+' + b + '}}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\frac{' +
-          a + '}{\\sqrt{ ' + a + 'x+' + b + '}+\\sqrt{' +
-          a + 'x+' + b + '}}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\frac{' +
-          a + '}{2 \\sqrt{' + a + 'x+' + b + '}}$')
-        question.answer.value = '$\\frac{df}{dx} = \\frac{' +
-          a + '}{2 \\sqrt{' + a + 'x+' + b + '}}$'
-      } else if (question.whichCase === 17) {
-        question.funct = 'sqrt(' + b + '-' + a + 'x)'
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ \\sqrt{ ' +
-          b + '-' + a + '(x+h)}-\\sqrt{' + b + '-' + a + 'x}}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ \\sqrt{ ' +
-          b + '-' + a + '(x+h)}-\\sqrt{' + b + '-' + a + 'x}}{h} \\cdot' +
-          '\\frac{\\sqrt{' + b + '-' + a + '(x+h)}+\\sqrt{' + b + '-' + a +
-          'x}}{\\sqrt{' + b + '-' + a + '(x+h)}+\\sqrt{' + b + '-' + a + 'x}}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{\\big(' +
-          b + '-' + a + 'x-' + a + 'h\\big)-\\big(' + b + '-' + a +
-          'x\\big)}{h \\big(\\sqrt{' + b + '-' + a + '(x+h)}+\\sqrt{' + b +
-          '-' + a + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' +
-          b + '-' + a + 'x-' + a + 'h-' + b + '+' + a +
-          'x}{h \\big(\\sqrt{' + b + '-' + a + '(x+h)}+\\sqrt{' + b +
-          '-' + a + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{-' +
-          a + 'h' + '}{h \\big(\\sqrt{' + b + '-' + a + '(x+h)}+\\sqrt{' +
-          b + '-' + a + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{-' +
-          a + '}{\\big(\\sqrt{' + b + '-' + a + '(x+h)}+\\sqrt{' +
-          b + '-' + a + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{-' +
-          a + '}{\\big(\\sqrt{' + b + '-' + a + '(x+0)}+\\sqrt{' +
-          b + '-' + a + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{-' +
-          a + '}{2 \\sqrt{' + b + '-' + a + 'x}}$')
-        question.answer.value = '$\\frac{df}{dx} =  \\frac{-' +
-          a + '}{2 \\sqrt{' + b + '-' + a + 'x}}$'
-      } else if (question.whichCase === 18) {
-        question.funct = '1/sqrt(' + a + 'x+' + b + ')'
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ \\frac{1}{\\sqrt{ ' +
-          a + '(x+h)+' + b + '}}-\\frac{1}{\\sqrt{' + a + 'x+' + b + '}}}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{\\sqrt{' + a + 'x+' + b +
-          '}-\\sqrt{' + a + '(x+h)+' + b + '}}{h\\sqrt{' + a + '(x+h)+' + b +
-          '}\\sqrt{' + a + 'x+' + b + '}}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{\\sqrt{' + a + 'x+' + b +
-          '}-\\sqrt{' + a + '(x+h)+' + b + '}}{h\\sqrt{' + a + '(x+h)+' + b +
-          '}\\sqrt{' + a + 'x+' + b + '}} \\cdot \\frac{\\sqrt{' + a + 'x+' + b +
-          '}+\\sqrt{' + a + '(x+h)+' + b + '}}{\\sqrt{' + a + 'x+' + b +
-          '}+\\sqrt{' + a + '(x+h)+' + b + '}}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{\\big(' + a + 'x+' + b +
-          '\\big)-\\big(' + a + '(x+h)+' + b + '\\big)}{h\\sqrt{' + a + '(x+h)+' + b +
-          '}\\sqrt{' + a + 'x+' + b + '}\\big(\\sqrt{' + a + 'x+' + b +
-          '}+\\sqrt{' + a + '(x+h)+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + a + 'x+' + b +
-          '-' + a + 'x-' + a + 'h-' + b + '}{h\\sqrt{' + a + '(x+h)+' + b +
-          '}\\sqrt{' + a + 'x+' + b + '}\\big(\\sqrt{' + a + 'x+' + b +
-          '}+\\sqrt{' + a + '(x+h)+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{-' + a + 'h' +
-          '}{h\\sqrt{' + a + '(x+h)+' + b +
-          '}\\sqrt{' + a + 'x+' + b + '}\\big(\\sqrt{' + a + 'x+' + b +
-          '}+\\sqrt{' + a + '(x+h)+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{-' + a + '' +
-          '}{\\sqrt{' + a + '(x+h)+' + b +
-          '}\\sqrt{' + a + 'x+' + b + '}\\big(\\sqrt{' + a + 'x+' + b +
-          '}+\\sqrt{' + a + '(x+h)+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{-' + a +
-          '}{\\sqrt{' + a + '(x+0)+' + b +
-          '}\\sqrt{' + a + 'x+' + b + '}\\big(\\sqrt{' + a + 'x+' + b +
-          '}+\\sqrt{' + a + '(x+0)+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{-' + a +
-          '}{\\sqrt{' + a + 'x+' + b +
-          '}\\sqrt{' + a + 'x+' + b + '}\\big(\\sqrt{' + a + 'x+' + b +
-          '}+\\sqrt{' + a + 'x+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{-' + a +
-          '}{\\big(' + a + 'x+' + b +
-          '\\big) \\big(2 \\sqrt{' + a + 'x+' + b +
-          '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{-' + a +
-          '}{2 \\sqrt[3]{' + a + 'x+' + b + '}}$')
-        question.answer.value = '$\\frac{df}{dx} =  \\frac{-' + a +
-          '}{2 \\sqrt[3]{' + a + 'x+' + b + '}}$'
-      } else if (question.whichCase === 19) {
-        question.funct = '1/sqrt(' + b + '-' + a + 'x)'
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ \\frac{1}{\\sqrt{ ' +
-          b + '-' + a + '(x+h)}}-\\frac{1}{\\sqrt{' + b + '-' + a + 'x}}}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{\\sqrt{' + b + '-' + a +
-          'x}-\\sqrt{' + b + '-' + a + '(x+h)}}{h\\sqrt{' + b + '-' + a +
-          '(x+h)}\\sqrt{' + b + '-' + a + 'x}}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{\\sqrt{' + b + '-' + a +
-          'x}-\\sqrt{' + b + '-' + a + '(x+h)}}{h\\sqrt{' + b + '-' + a +
-          '(x+h)}\\sqrt{' + b + '-' + a + 'x}} \\cdot \\frac{\\sqrt{' + b + '-' + a +
-          'x}+\\sqrt{' + b + '-' + a + '(x+h)}}{\\sqrt{' + b + '-' + a +
-          'x}+\\sqrt{' + b + '-' + b + '(x+h)}}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{\\big(' + b + '-' + a +
-          'x\\big)-\\big(' + b + '-' + a + '(x+h)\\big)}{h\\sqrt{' + b + '-' + a +
-          '(x+h)}\\sqrt{' + b + '-' + a + 'x}\\big(\\sqrt{' + b + '-' + a +
-          'x}+\\sqrt{' + b + '-' + a + '(x+h)}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{\\big(' + b + '-' + a +
-          'x\\big)-\\big(' + b + '-' + a + 'x-' + a + 'h)\\big)}{h\\sqrt{' + b +
-          '-' + a + '(x+h)}\\sqrt{' + b + '-' + a + 'x}\\big(\\sqrt{' + b +
-          '-' + a + 'x}+\\sqrt{' + b + '-' + a + '(x+h)}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + b + '-' + a +
-          'x-' + b + '+' + a + 'h+' + a + 'x}{h\\sqrt{' + b + '-' + a +
-          '(x+h)}\\sqrt{' + b + '-' + a + 'x}\\big(\\sqrt{' + b + '-' + a +
-          'x}+\\sqrt{' + b + '-' + a + '(x+h)}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + a + 'h' +
-          '}{h\\sqrt{' + b + '-' + a +
-          '(x+h)}\\sqrt{' + b + '-' + a + 'x}\\big(\\sqrt{' + b + '-' + a +
-          'x}+\\sqrt{' + b + '-' + a + '(x+h)}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + a + '' +
-          '}{\\sqrt{' + b + '-' + a +
-          '(x+h)}\\sqrt{' + b + '-' + a + 'x}\\big(\\sqrt{' + b + '-' + a +
-          'x}+\\sqrt{' + b + '-' + a + '(x+h)}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{' + a +
-          '}{\\sqrt{' + b + '-' + a +
-          '(x+0)}\\sqrt{' + b + '-' + a + 'x}\\big(\\sqrt{' + b + '-' + a +
-          'x}+\\sqrt{' + b + '-' + a + '(x+0)}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{' + a +
-          '}{\\sqrt{' + b + '-' + a +
-          'x}\\sqrt{' + b + '-' + a + 'x}\\big(\\sqrt{' + b + '-' + a +
-          'x}+\\sqrt{' + b + '-' + a + 'x}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{' + a +
-          '}{\\big(' + b + '-' + a +
-          'x\\big) \\big(2 \\sqrt{' + b + '-' + a +
-          'x}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{' + a +
-          '}{2 \\sqrt[3]{' + b + '-' + a + 'x}}$')
-        question.answer.value = '$\\frac{df}{dx} =  \\frac{' + a +
-          '}{2 \\sqrt[3]{' + b + '-' + a + 'x}}$'
-      } else if (question.whichCase === 20) {
-        question.funct = 'sqrt(' + a + 'x^2+' + b + ')'
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ \\sqrt{ ' +
-          a + '(x+h)^2+' + b + '}-\\sqrt{' + a + 'x^2+' + b + '}}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ \\sqrt{ ' +
-          a + '(x+h)^2+' + b + '}-\\sqrt{' + a + 'x^2+' + b + '}}{h}' +
-          '\\cdot\\frac{\\sqrt{' + a + '(x+h)^2+' + b + '}+\\sqrt{' + a +
-          'x^2+' + b + '}}{\\sqrt{' + a + '(x+h)^2+' + b + '}+\\sqrt{' +
-          a + 'x^2+' + b + '}}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ \\big(' +
-          a + '(x+h)^2+' + b + '\\big)-\\big(' + a + 'x^2+' + b +
-          '\\big)}{h\\big(\\sqrt{ ' + a + '(x+h)^2+' + b + '}+\\sqrt{' + a +
-          'x^2+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ \\big(' +
-          a + '(x^2+2xh+h^2)+' + b + '\\big)-\\big(' + a + 'x^2+' + b +
-          '\\big)}{h\\big(\\sqrt{ ' + a + '(x+h)^2+' + b + '}+\\sqrt{' + a +
-          'x^2+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ \\big(' +
-          a + 'x^2+' + a + '\\cdot 2xh+' + a + 'h^2+' + b +
-          '\\big)-\\big(' + a + 'x^2+' + b + '\\big)}{h\\big(\\sqrt{ ' + a +
-          '(x+h)^2+' + b + '}+\\sqrt{' + a +
-          'x^2+' + b + '}\\big)}$')
-        let val = evaluate(a.toString() + '*2')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ \\big(' +
-          a + 'x^2+' + val + 'xh+' + a + 'h^2+' + b +
-          '\\big)-\\big(' + a + 'x^2+' + b + '\\big)}{h\\big(\\sqrt{ ' + a +
-          '(x+h)^2+' + b + '}+\\sqrt{' + a +
-          'x^2+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' +
-          a + 'x^2+' + val + 'xh+' + a + 'h^2+' + b +
-          '-' + a + 'x^2-' + b + '}{h\\big(\\sqrt{ ' + a +
-          '(x+h)^2+' + b + '}+\\sqrt{' + a +
-          'x^2+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{(' +
-          val + 'x+' + a + 'h)h}{h\\big(\\sqrt{ ' + a +
-          '(x+h)^2+' + b + '}+\\sqrt{' + a +
-          'x^2+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' +
-          val + 'x+' + a + 'h}{\\big(\\sqrt{ ' + a +
-          '(x+h)^2+' + b + '}+\\sqrt{' + a +
-          'x^2+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\frac{' +
-          val + 'x+' + a + '\\cdot0}{\\big(\\sqrt{ ' + a +
-          '(x+0)^2+' + b + '}+\\sqrt{' + a +
-          'x^2+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\frac{' +
-          val + 'x+' + a + '\\cdot0}{\\big(\\sqrt{ ' + a +
-          'x^2+' + b + '}+\\sqrt{' + a +
-          'x^2+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\frac{' + a + 'x}{ \\sqrt{' + a +
-          'x^2+' + b + '}}$')
-        question.answer.value = '$\\frac{df}{dx} = \\frac{' + a + 'x}{ \\sqrt{' + a +
-          'x^2+' + b + '}}$'
-      } else if (question.whichCase === 21) {
-        question.funct = 'sqrt(' + b + '-' + a + 'x^2)'
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ \\sqrt{ ' +
-          b + '-' + a + '(x+h)^2}-\\sqrt{' + b + '-' + a + 'x^2}}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ \\sqrt{ ' +
-          b + '-' + a + '(x+h)^2}-\\sqrt{' + b + '-' + a + 'x^2}}{h}' +
-          '\\cdot\\frac{\\sqrt{' + b + '-' + a + '(x+h)^2}+\\sqrt{' + b +
-          '-' + a + 'x^2}}{\\sqrt{' + b + '-' + a + '(x+h)^2}+\\sqrt{' +
-          b + '-' + a + 'x^2}}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ \\big(' +
-          b + '-' + a + '(x+h)^2\\big)-\\big(' + b + '-' + a +
-          'x^2\\big)}{h\\big(\\sqrt{ ' + b + '-' + a + '(x+h)^2}+\\sqrt{' + b +
-          '-' + a + 'x^2}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ \\big(' +
-          b + '-' + a + '(x^2+2xh+h^2)\\big)-\\big(' + b + '-' + a +
-          'x^2\\big)}{h\\big(\\sqrt{ ' + b + '-' + a + '(x+h)^2}+\\sqrt{' + b +
-          '-' + a + 'x^2}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ \\big(' + b + '-' +
-          a + 'x^2-' + a + '\\cdot 2xh-' + a + 'h^2+' +
-          '\\big)-\\big(' + b + '-' + a + 'x^2\\big)}{h\\big(\\sqrt{ ' + b +
-          '-' + a + '(x+h)^2}+\\sqrt{' + b +
-          '-' + b + 'x^2}\\big)}$')
-        let val = evaluate(a.toString() + '*2')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ \\big(' + b + '-' +
-          a + 'x^2-' + val + 'xh-' + a + 'h^2' +
-          '\\big)-\\big(' + b + '-' + a + 'x^2\\big)}{h\\big(\\sqrt{ ' + b +
-          '-' + a + '(x+h)^2}+\\sqrt{' + b +
-          '-' + a + 'x^2}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + b + '-' +
-          a + 'x^2-' + val + 'xh-' + a + 'h^2-' +
-          b + '+' + a + 'x^2}{h\\big(\\sqrt{ ' + b +
-          '-' + a + '(x+h)^2}+\\sqrt{' + b +
-          '-' + a + 'x^2}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{-(' +
-          val + 'x+' + a + 'h)h}{h\\big(\\sqrt{ ' + b +
-          '-' + a + '(x+h)^2}+\\sqrt{' + b +
-          '-' + a + 'x^2}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{-' +
-          val + 'x-' + a + 'h}{\\big(\\sqrt{ ' + b +
-          '-' + b + '(x+h)^2}+\\sqrt{' + b +
-          '-' + a + 'x^2}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\frac{-' +
-          val + 'x+' + a + '\\cdot0}{\\big(\\sqrt{ ' + b +
-          '-' + a + '(x+0)^2}+\\sqrt{' + b +
-          '-' + a + 'x^2}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\frac{-' +
-          val + 'x+' + a + '\\cdot0}{\\big(\\sqrt{ ' + b +
-          '-' + a + 'x^2}+\\sqrt{' + b +
-          '-' + a + 'x^2}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\frac{-' + a + 'x}{\\sqrt{' + b +
-          '-' + a + 'x^2}}$')
-        question.answer.value = '$\\frac{df}{dx} = \\frac{-' + a + 'x}{\\sqrt{' + b +
-          '-' + a + 'x^2}}$'
-      } else if (question.whichCase === 22) {
-        question.funct = c + '/sqrt(' + a + 'x^2+' + b + ')'
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ \\frac{' + c + '}{\\sqrt{ ' +
-          a + '(x+h)^2+' + b + '}}-\\frac{' + c + '}{\\sqrt{' + a + 'x^2+' +
-          b + '}}}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c + '\\left[\\sqrt{' +
-          a + 'x^2+' + b + '}-\\sqrt{' + a + '(x+h)^2+' + b +
-          '}\\right]}{h\\sqrt{' + a + '(x+h)^2+' + b + '}\\sqrt{' + a +
-          'x^2+' + b + '}}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c + '\\left[\\sqrt{' +
-          a + 'x^2+' + b + '}-\\sqrt{' + a + '(x+h)^2+' + b +
-          '}\\right]}{h\\sqrt{' + a + '(x+h)^2+' + b + '}\\sqrt{' + a +
-          'x^2+' + b + '}} \\cdot \\frac{\\sqrt{' + a + 'x^2+' + b +
-          '}+\\sqrt{' + a + '(x+h)^2+' + b + '}}{\\sqrt{' + a + 'x^2+' + b +
-          '}+\\sqrt{' + a + '(x+h)^2+' + b + '}}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c + '\\left[\\big(' +
-          a + 'x^2+' + b + '\\big)-\\big(' + a + '(x+h)^2+' + b +
-          '\\big)\\right]}{h\\sqrt{' + a + '(x+h)^2+' + b + '}\\sqrt{' + a +
-          'x^2+' + b + '} \\big(\\sqrt{ ' + a + 'x^2+' + b +
-          '}+\\sqrt{' + a + '(x+h)^2+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c + '\\left[\\big(' +
-          a + 'x^2+' + b + '\\big)-\\big(' + a + '(x^2+2xh+h^2)+' + b +
-          '\\big)\\right]}{h\\sqrt{' + a + '(x+h)^2+' + b + '}\\sqrt{' + a +
-          'x^2+' + b + '} \\big(\\sqrt{ ' + a + 'x^2+' + b +
-          '}+\\sqrt{' + a + '(x+h)^2+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c + '\\left[\\big(' +
-          a + 'x^2+' + b + '\\big)-\\big(' + a + 'x^2+' + a +
-          '\\cdot2xh+' + a + 'h^2+' + b +
-          '\\big)\\right]}{h\\sqrt{' + a + '(x+h)^2+' + b + '}\\sqrt{' + a +
-          'x^2+' + b + '} \\big(\\sqrt{ ' + a + 'x^2+' + b +
-          '}+\\sqrt{' + a + '(x+h)^2+' + b + '}\\big)}$')
-        let val = evaluate(a.toString() + '*2')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c + '\\left[' +
-          a + 'x^2+' + b + '-' + a + 'x^2-' + val +
-          'xh-' + a + 'h^2-' + b +
-          '\\right]}{h\\sqrt{' + a + '(x+h)^2+' + b + '}\\sqrt{' + a +
-          'x^2+' + b + '} \\big(\\sqrt{ ' + a + 'x^2+' + b +
-          '}+\\sqrt{' + a + '(x+h)^2+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{-' + c + 'h\\left[' +
-          val + 'x+' + a + 'h' + '\\right]}{h\\sqrt{' + a + '(x+h)^2+' + b +
-          '}\\sqrt{' + a + 'x^2+' + b + '} \\big(\\sqrt{ ' + a + 'x^2+' + b +
-          '}+\\sqrt{' + a + '(x+h)^2+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{-' + c + '\\left[' +
-          val + 'x+' + a + 'h' + '\\right]}{\\sqrt{' + a + '(x+h)^2+' + b +
-          '}\\sqrt{' + a + 'x^2+' + b + '} \\big(\\sqrt{ ' + a + 'x^2+' + b +
-          '}+\\sqrt{' + a + '(x+h)^2+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{-' + c + '\\left[' +
-          val + 'x+' + a + '\\cdot0' + '\\right]}{\\sqrt{' + a + '(x+0)^2+' + b +
-          '}\\sqrt{' + a + 'x^2+' + b + '} \\big(\\sqrt{ ' + a + 'x^2+' + b +
-          '}+\\sqrt{' + a + '(x+0)^2+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{-' + c + '\\cdot' +
-          val + 'x}{\\sqrt{' + a + 'x^2+' + b +
-          '}\\sqrt{' + a + 'x^2+' + b + '} \\big(\\sqrt{ ' + a + 'x^2+' + b +
-          '}+\\sqrt{' + a + 'x^2+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{-' + c + '\\cdot' +
-          val + 'x}{2 \\sqrt{' + a + 'x^2+' + b +
-          '}\\sqrt{' + a + 'x^2+' + b + '} \\big(\\sqrt{ ' + a +
-          'x^2+' + b + '}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{-' + c + '\\cdot' +
-          a + 'x}{\\sqrt[3]{' + a + 'x^2+' + b + '}}$')
-        let valCxA = evaluate(a.toString() + '*' + c)
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{-' + valCxA + 'x}{\\sqrt[3]{' +
-          a + 'x^2+' + b + '}}$')
-        question.answer.value = '$\\frac{df}{dx} =  \\frac{-' + valCxA + 'x}{\\sqrt[3]{' +
-          a + 'x^2+' + b + '}}$'
-      } else if (question.whichCase === 23) {
-        question.funct = c + '/sqrt(' + b + '-' + a + 'x^2)'
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{f(x + h) - f(x)}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{ \\frac{' + c + '}{\\sqrt{ ' +
-          b + '-' + a + '(x+h)^2}}-\\frac{' + c + '}{\\sqrt{' + b + '-' +
-          a + 'x^2}}}{h}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c + '\\left[\\sqrt{' +
-          b + '-' + a + 'x^2}-\\sqrt{' + b + '-' + a +
-          '(x+h)^2}\\right]}{h\\sqrt{' + b + '-' + a + '(x+h)^2}\\sqrt{' + b +
-          '-' + a + 'x^2+}}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c + '\\left[\\sqrt{' +
-          b + '-' + a + 'x^2}-\\sqrt{' + b + '-' + a +
-          '(x+h)^2}\\right]}{h\\sqrt{' + b + '-' + a + '(x+h)^2}\\sqrt{' + b +
-          '-' + a + 'x^2}} \\cdot \\frac{\\sqrt{' + b + '-' + a +
-          'x^2}+\\sqrt{' + b + '-' + a + '(x+h)^2}}{\\sqrt{' + b + '-' + a +
-          'x^2}+\\sqrt{' + b + '-' + a + '(x+h)^2+}}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c + '\\left[\\big(' +
-          b + '-' + a + 'x^2\\big)-\\big(' + b + '-' + b +
-          '(x+h)^2\\big)\\right]}{h\\sqrt{' + b + '-' + a + '(x+h)^2}\\sqrt{' + b +
-          '-' + a + 'x^2} \\big(\\sqrt{ ' + b + '-' + b +
-          'x^2}+\\sqrt{' + b + '-' + a + '(x+h)^2}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c + '\\left[\\big(' +
-          b + '-' + a + 'x^2\\big)-\\big(' + b + '-' + a +
-          '(x^2+2xh+h^2)\\big)\\right]}{h\\sqrt{' + b + '-' + a + '(x+h)^2}\\sqrt{' + b +
-          '-' + a + 'x^2} \\big(\\sqrt{ ' + b + '-' + a +
-          'x^2}+\\sqrt{' + b + '-' + a + '(x+h)^2}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c + '\\left[\\big(' +
-          b + '-' + a + 'x^2\\big)-\\big(' + b + '-' + a + 'x^2-' + a +
-          '\\cdot2xh-' + a + 'h^2' + '\\big)\\right]}{h\\sqrt{' + b + '-' + a +
-          '(x+h)^2}\\sqrt{' + b + '-' + a + 'x^2} \\big(\\sqrt{ ' + b + '-' + a +
-          'x^2}+\\sqrt{' + b + '-' + a + '(x+h)^2}\\big)}$')
-        let val = evaluate(a.toString() + '*2')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c + '\\left[' +
-          b + '-' + a + 'x^2-' + b + '+' + a + 'x^2+' + val +
-          'xh+' + a + 'h^2' +
-          '\\right]}{h\\sqrt{' + b + '-' + a + '(x+h)^2}\\sqrt{' + b +
-          '-' + a + 'x^2} \\big(\\sqrt{ ' + b + '-' + a +
-          'x^2}+\\sqrt{' + b + '-' + a + '(x+h)^2}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c + 'h\\left[' +
-          val + 'x+' + a + 'h' + '\\right]}{h\\sqrt{' + b + '-' + a +
-          '(x+h)^2}\\sqrt{' + b + '-' + a + 'x^2} \\big(\\sqrt{ ' + b + '-' + a +
-          'x^2}+\\sqrt{' + b + '-' + a + '(x+h)^2}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} = \\lim_{h \\to 0} \\frac{' + c + '\\left[' +
-          val + 'x+' + a + 'h' + '\\right]}{\\sqrt{' + b + '-' + a +
-          '(x+h)^2}\\sqrt{' + b + '-' + a + 'x^2} \\big(\\sqrt{ ' + b + '-' + a +
-          'x^2}+\\sqrt{' + b + '-' + a + '(x+h)^2}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{' + c + '\\left[' +
-          val + 'x+' + a + '\\cdot0' + '\\right]}{\\sqrt{' + b + '-' + b +
-          '(x+0)^2}\\sqrt{' + b + '-' + a + 'x^2} \\big(\\sqrt{ ' + b + '-' + a +
-          'x^2}+\\sqrt{' + b + '-' + a + '(x+0)^2}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{' + c + '\\cdot' +
-          val + 'x}{\\sqrt{' + b + '-' + a +
-          'x^2}\\sqrt{' + b + '-' + a + 'x^2} \\big(\\sqrt{ ' + b + '-' + a +
-          'x^2}+\\sqrt{' + b + '-' + a + 'x^2}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{' + c + '\\cdot' +
-          val + 'x}{2 \\sqrt{' + b + '-' + a +
-          'x^2}\\sqrt{' + b + '-' + a + 'x^2} \\big(\\sqrt{ ' + b +
-          '-' + a + 'x^2}\\big)}$')
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{' + c + '\\cdot' +
-          a + 'x}{\\sqrt[3]{' + b + '-' + a + 'x^2}}$')
-        let valCxA = evaluate(a.toString() + '*' + c)
-        question.working.steps.push('$\\frac{df}{dx} =  \\frac{' + valCxA + 'x}{\\sqrt[3]{' +
-          b + '-' + a + 'x^2}}$')
-        question.answer.value = '$\\frac{df}{dx} =  \\frac{' + valCxA + 'x}{\\sqrt[3]{' +
-          b + '-' + a + 'x^2}}$'
-      }
-      question.answer.value = this.niceDisplay(question.answer.value)
-      question.working.steps = this.niceDisplay(question.working.steps)
-      question.funct = this.parseToTex(this.niceDisplay(question.funct))
-      return question
+    hideTutorial () {
+      this.tutorial = false
+    },
+    showTutorial () {
+      this.tutorial = true
     }
   }
 }

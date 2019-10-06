@@ -253,7 +253,7 @@ export default {
       working: { steps: [], visibility: false },
       question: undefined,
       methods: ['Doolitle Factorisation', 'Crout Factorisation', 'Naive Gaussian Elimination'],
-      method: 'Doolitle Factorisation'
+      method: 'Crout Factorisation'
     }
   },
   computed: {
@@ -278,6 +278,13 @@ export default {
         this.n = 2
       }
     },
+    method: function (value) {
+      this.working.steps = []
+      this.working.visibility = false
+      this.answer.value = undefined
+      this.answer.visibility = false
+      this.generateQuestion()
+    },
     'answer.visibility' () {
       if (this.answer.value === undefined) {
         this.hideAnswer()
@@ -297,9 +304,9 @@ export default {
   methods: {
     solve () {
       this.working.steps = []
+      let l = this.generateEmptyMatrix()
+      let u = this.generateEmptyMatrix()
       if (this.method === 'Doolitle Factorisation') {
-        let l = this.generateEmptyMatrix()
-        let u = this.generateEmptyMatrix()
         for (let i = 0; i < this.n; i++) {
           for (let j = 0; j < this.n; j++) {
             if (i === j) {
@@ -358,7 +365,7 @@ export default {
         }
         for (let i = 0; i < temp.length; i++) {
           if (temp[i] !== '') {
-            temp[i] = temp[i] + `=${arr[i]}\\\\`
+            temp[i] = temp[i] + `&=${arr[i]}`
           }
         }
         this.working.steps.push(`Multiplying the matrix equation and solving for the unknowns in succession gives`)
@@ -368,17 +375,17 @@ export default {
           for (let i = 0; i < temp.length; i++) {
             if (temp[i] !== '') {
               if (i === 0) {
-                this.working.steps.push(`$$ ${temp[i]} \\\\ ${temp[i]} $$`)
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\end{align*}$$`)
               } else if (i === 1) {
-                this.working.steps.push(`$$ ${temp[i]} \\\\ l_{2,1} = ${this.matrix[1][0] / this.matrix[0][0]} $$`)
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ l_{2,1} = ${this.matrix[1][0] / this.matrix[0][0]} \\end{align*}$$`)
                 l[1][0] = this.matrix[1][0] / this.matrix[0][0]
               } else if (i === 2) {
-                this.working.steps.push(`$$ ${temp[i]} \\\\  ${temp[i]} $$`)
+                this.working.steps.push(`$$\\begin{align*} ${temp[i]} \\end{align*}$$`)
               } else if (i === 3) {
-                this.working.steps.push(`$$ ${temp[i]} \\\\
-                  ${this.matrix[0][1]}\\cdot${this.matrix[1][0] / this.matrix[0][0]} + u_{2,2} = ${this.matrix[1][1]} \\\\
-                  u_{2,2} = ${this.matrix[1][1] - this.matrix[0][1] * this.matrix[1][0] / this.matrix[0][0]}
-                $$`)
+                this.working.steps.push(`$$\\begin{align*} ${temp[i]} \\\\
+                  ${this.matrix[0][1]}\\cdot${this.matrix[1][0] / this.matrix[0][0]} + u_{2,2} &= ${this.matrix[1][1]} \\\\
+                  u_{2,2} &= ${this.matrix[1][1] - this.matrix[0][1] * this.matrix[1][0] / this.matrix[0][0]}
+                \\end{align*}$$`)
                 u[1][1] = this.matrix[1][1] - this.matrix[0][1] * this.matrix[1][0] / this.matrix[0][0]
               }
             }
@@ -390,38 +397,40 @@ export default {
           for (let i = 0; i < temp.length; i++) {
             if (temp[i] !== '') {
               if (i === 0 || i === 3 || i === 6) {
-                this.working.steps.push(`$$ ${temp[i]} \\\\$$`)
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\end{align*}$$`)
               } else if (i === 1) {
-                this.working.steps.push(`$$ \\\\ ${temp[i]} \\\\ l_{2,1} = ${this.matrix[1][0] / this.matrix[0][0]} $$`)
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ l_{2,1} &= ${this.matrix[1][0] / this.matrix[0][0]} 
+                \\end{align*}$$`)
                 l[1][0] = this.matrix[1][0] / this.matrix[0][0]
               } else if (i === 2) {
-                this.working.steps.push(`$$ \\\\  ${temp[i]} \\\\ l_{3,1} = ${this.matrix[2][0] / this.matrix[0][0]} $$`)
+                this.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\ l_{3,1} &= ${this.matrix[2][0] / this.matrix[0][0]} 
+                \\end{align*}$$`)
                 l[2][0] = this.matrix[2][0] / this.matrix[0][0]
               } else if (i === 4) {
-                this.working.steps.push(`$$  \\\\ ${temp[i]} \\\\
-                  ${u[0][1]} \\cdot ${l[1][0]} + u_{2,2} = ${this.matrix[1][1]} \\\\
-                  u_{2,2} = ${this.matrix[1][1] - u[0][1] * l[1][0]} \\\\
-                $$`)
+                this.working.steps.push(`$$  \\begin{align*} ${temp[i]} \\\\
+                  ${u[0][1]} \\cdot ${l[1][0]} + u_{2,2} &= ${this.matrix[1][1]} \\\\
+                  u_{2,2} &= ${this.matrix[1][1] - u[0][1] * l[1][0]} 
+                \\end{align*}$$`)
                 u[1][1] = this.matrix[1][1] - u[0][1] * l[1][0]
               } else if (i === 5) {
                 let lhs = this.matrix[2][1]
-                this.working.steps.push(`$$ \\\\  ${temp[i]} \\\\
-                  ${u[0][1]} \\cdot${l[2][0]} + ${u[1][1]}\\cdot l_{3,2} = ${lhs} \\\\
-                  ${u[1][1]} \\cdot l_{3,2} = ${lhs - u[0][1] * l[2][0]} \\\\
-                  l_{3,2} = ${(lhs - u[0][1] * l[2][0]) / u[1][1]} \\\\
-                $$`)
+                this.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\
+                  ${u[0][1]} \\cdot${l[2][0]} + ${u[1][1]}\\cdot l_{3,2} &= ${lhs} \\\\
+                  ${u[1][1]} \\cdot l_{3,2} &= ${lhs - u[0][1] * l[2][0]} \\\\
+                  l_{3,2} &= ${(lhs - u[0][1] * l[2][0]) / u[1][1]}
+                \\end{align*}$$`)
                 l[2][1] = (lhs - u[0][1] * l[2][0]) / u[1][1]
               } else if (i === 7) {
-                this.working.steps.push(`$$ \\\\ ${temp[i]} \\\\
-                  ${u[0][2]} \\cdot \\ ${l[1][0]} + u_{2,3} = ${this.matrix[1][2]} \\\\
-                  u_{2,3} = ${this.matrix[1][2] - u[0][2] * l[1][0]} \\\\
-                $$`)
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\
+                  ${u[0][2]} \\cdot \\ ${l[1][0]} + u_{2,3} &= ${this.matrix[1][2]} \\\\
+                  u_{2,3} &= ${this.matrix[1][2] - u[0][2] * l[1][0]} 
+                \\end{align*}$$`)
                 u[1][2] = this.matrix[1][2] - u[0][2] * l[1][0]
               } else {
-                this.working.steps.push(`$$ ${temp[i]} \\\\  
-                ${u[0][2]} \\cdot ${l[2][0]} + ${u[1][2]} \\cdot ${l[2][1]} + u_{3,3} = ${this.matrix[2][2]} \\\\
-                u_{3,3} = ${this.matrix[2][2] - u[0][2] * l[2][0] - u[1][2] * l[2][1]} \\\\\
-                $$`)
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\  
+                ${u[0][2]} \\cdot ${l[2][0]} + ${u[1][2]} \\cdot ${l[2][1]} + u_{3,3} &= ${this.matrix[2][2]} \\\\
+                u_{3,3} &= ${this.matrix[2][2] - u[0][2] * l[2][0] - u[1][2] * l[2][1]}
+                \\end{align*}$$`)
                 u[2][2] = this.matrix[2][2] - u[0][2] * l[2][0] - u[1][2] * l[2][1]
               }
             }
@@ -434,101 +443,328 @@ export default {
           for (let i = 0; i < temp.length; i++) {
             if (temp[i] !== '') {
               if (i === 0 || i === 4 || i === 8 || i === 12) {
-                this.working.steps.push(`$$ \\\\ ${temp[i]} \\\\$$`)
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\end{align*} $$`)
               } else if (i === 1) {
-                this.working.steps.push(`$$ \\\\ ${temp[i]} \\\\ l_{2,1} = ${this.matrix[1][0] / this.matrix[0][0]} \\\\$$`)
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ l_{2,1} &= ${this.matrix[1][0] / this.matrix[0][0]} 
+                \\end{align*}$$`)
                 l[1][0] = this.matrix[1][0] / this.matrix[0][0]
               } else if (i === 2) {
-                this.working.steps.push(`$$ \\\\ ${temp[i]} \\\\ l_{3,1} = ${this.matrix[2][0] / this.matrix[0][0]} \\\\$$`)
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ l_{3,1} &= ${this.matrix[2][0] / this.matrix[0][0]} \\end{align*}$$`)
                 l[2][0] = this.matrix[2][0] / this.matrix[0][0]
               } else if (i === 3) {
-                this.working.steps.push(`$$ \\\\ ${temp[i]} \\\\ l_{4,1} = ${this.matrix[3][0] / this.matrix[0][0]} \\\\$$`)
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ l_{4,1} &= ${this.matrix[3][0] / this.matrix[0][0]} \\end{align*}$$`)
                 l[3][0] = this.matrix[3][0] / this.matrix[0][0]
               } else if (i === 5) {
-                this.working.steps.push(`$$  \\\\ ${temp[i]} \\\\
-                  ${u[0][1]} \\cdot ${l[1][0]} + u_{2,2} = ${this.matrix[1][1]} \\\\
-                  u_{2,2} = ${this.matrix[1][1] - u[0][1] * l[1][0]} \\\\
-                $$`)
+                this.working.steps.push(`$$  \\begin{align*} ${temp[i]} \\\\
+                  ${u[0][1]} \\cdot ${l[1][0]} + u_{2,2} &= ${this.matrix[1][1]} \\\\
+                  u_{2,2} &= ${this.matrix[1][1] - u[0][1] * l[1][0]} 
+                \\end{align*}$$`)
                 u[1][1] = this.matrix[1][1] - u[0][1] * l[1][0]
               } else if (i === 6) {
                 let lhs = this.matrix[2][1]
-                this.working.steps.push(`$$ \\\\  ${temp[i]} \\\\
-                  ${u[0][1]} \\cdot ${l[2][0]} + ${u[1][1]}\\cdot l_{3,2} = ${lhs} \\\\
-                  ${u[1][1]} \\cdot l_{3,2} = ${lhs - u[0][1] * l[2][0]} \\\\
-                  l_{3,2} = ${(lhs - u[0][1] * l[2][0]) / u[1][1]} \\\\
-                $$`)
+                this.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\
+                  ${u[0][1]} \\cdot ${l[2][0]} + ${u[1][1]}\\cdot l_{3,2} &= ${lhs} \\\\
+                  ${u[1][1]} \\cdot l_{3,2} &= ${lhs - u[0][1] * l[2][0]} \\\\
+                  l_{3,2} &= ${(lhs - u[0][1] * l[2][0]) / u[1][1]} 
+                \\end{align*}$$`)
                 l[2][1] = (lhs - u[0][1] * l[2][0]) / u[1][1]
               } else if (i === 7) {
                 let lhs = this.matrix[3][1]
-                this.working.steps.push(`$$ \\\\  ${temp[i]} \\\\
-                  ${u[0][1]} \\cdot ${l[3][0]} + ${u[1][1]}\\cdot l_{4,2} = ${lhs} \\\\
-                  ${u[1][1]} \\cdot l_{4,2} = ${lhs - u[0][1] * l[3][0]} \\\\
-                  l_{4,2} = ${(lhs - u[0][1] * l[3][0]) / u[1][1]} \\\\
-                $$`)
+                this.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\
+                  ${u[0][1]} \\cdot ${l[3][0]} + ${u[1][1]}\\cdot l_{4,2} &= ${lhs} \\\\
+                  ${u[1][1]} \\cdot l_{4,2} &= ${lhs - u[0][1] * l[3][0]} \\\\
+                  l_{4,2} &= ${(lhs - u[0][1] * l[3][0]) / u[1][1]} 
+                \\end{align*}$$`)
                 l[3][1] = (lhs - u[0][1] * l[3][0]) / u[1][1]
               } else if (i === 9) {
-                this.working.steps.push(`$$  \\\\ ${temp[i]} \\\\
-                  ${u[0][2]} \\cdot ${l[1][0]} + u_{2,3} = ${this.matrix[1][2]} \\\\
-                  u_{2,3} = ${this.matrix[1][2] - u[0][2] * l[1][0]} \\\\
-                $$`)
+                this.working.steps.push(`$$  \\begin{align*} ${temp[i]} \\\\
+                  ${u[0][2]} \\cdot ${l[1][0]} + u_{2,3} &= ${this.matrix[1][2]} \\\\
+                  u_{2,3} &= ${this.matrix[1][2] - u[0][2] * l[1][0]}
+                \\end{align*}$$`)
                 u[1][2] = this.matrix[1][2] - u[0][2] * l[1][0]
               } else if (i === 10) {
                 let lhs = this.matrix[2][2]
-                this.working.steps.push(`$$ \\\\ ${temp[i]} \\\\ 
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
                  ${u[0][2]} \\cdot ${l[2][0]} + ${u[1][2]} \\cdot ${l[2][1]} + u_{3,3} = ${lhs} \\\\
                 u_{3,3} = ${lhs - u[0][2] * l[2][0] - u[1][2] * l[2][1]}
-                $$`)
+                \\end{align*}$$`)
                 u[2][2] = lhs - u[0][2] * l[2][0] - u[1][2] * l[2][1]
               } else if (i === 11) {
                 let lhs = this.matrix[3][2]
-                this.working.steps.push(`$$ \\\\ ${temp[i]} \\\\ 
-                 ${u[0][2]} \\cdot ${l[3][0]} + ${u[1][2]} \\cdot ${l[3][1]} + ${u[2][2]} \\cdot l_{4,3} = ${lhs} \\\\
-                ${u[2][2]} \\cdot l_{4,3} = ${lhs - u[0][2] * l[3][0] - u[1][2] * l[3][1]} \\\\
-                l_{4,3} = ${(lhs - u[0][2] * l[3][0] - u[1][2] * l[3][1]) / u[2][2]}
-                $$`)
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                 ${u[0][2]} \\cdot ${l[3][0]} + ${u[1][2]} \\cdot ${l[3][1]} + ${u[2][2]} \\cdot l_{4,3} &= ${lhs} \\\\
+                ${u[2][2]} \\cdot l_{4,3} &= ${lhs - u[0][2] * l[3][0] - u[1][2] * l[3][1]} \\\\
+                l_{4,3} &= ${(lhs - u[0][2] * l[3][0] - u[1][2] * l[3][1]) / u[2][2]}
+                \\end{align*}$$`)
                 l[3][2] = (lhs - u[0][2] * l[3][0] - u[1][2] * l[3][1]) / u[2][2]
               } else if (i === 13) {
-                this.working.steps.push(`$$  \\\\ ${temp[i]} \\\\
-                  ${u[0][3]} \\cdot ${l[1][0]} + u_{2,4} = ${this.matrix[1][1]} \\\\
-                  u_{2,4} = ${this.matrix[1][3] - u[0][3] * l[1][0]} \\\\
-                $$`)
+                this.working.steps.push(`$$  \\begin{align*} ${temp[i]} \\\\
+                  ${u[0][3]} \\cdot ${l[1][0]} + u_{2,4} &= ${this.matrix[1][1]} \\\\
+                  u_{2,4} &= ${this.matrix[1][3] - u[0][3] * l[1][0]} 
+                \\end{align*}$$`)
                 u[1][3] = this.matrix[1][3] - u[0][3] * l[1][0]
               } else if (i === 14) {
                 let lhs = this.matrix[2][3]
-                this.working.steps.push(`$$ \\\\ ${temp[i]} \\\\ 
-                 ${u[0][3]} \\cdot ${l[2][0]} + ${u[1][3]} \\cdot ${l[2][1]} + u_{3,4} = ${lhs} \\\\
-                u_{3,4} = ${lhs - u[0][3] * l[2][0] - u[1][3] * l[2][1]}
-                $$`)
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                 ${u[0][3]} \\cdot ${l[2][0]} + ${u[1][3]} \\cdot ${l[2][1]} + u_{3,4} &= ${lhs} \\\\
+                u_{3,4} &= ${lhs - u[0][3] * l[2][0] - u[1][3] * l[2][1]}
+                \\end{align*}$$`)
                 u[2][3] = lhs - u[0][3] * l[2][0] - u[1][3] * l[2][1]
               } else if (i === 15) {
                 let lhs = this.matrix[3][3]
-                this.working.steps.push(`$$ \\\\ ${temp[i]} \\\\ 
-                 ${u[0][3]} \\cdot ${l[3][0]} + ${u[1][3]} \\cdot ${l[3][2]} + ${u[2][3]} \\cdot ${l[3][2]}+ u_{4,4} = ${lhs} \\\\
-                u_{4,4} = ${lhs - u[0][3] * l[3][0] - u[1][3] * l[3][1] - u[2][3] * l[3][2]}
-                $$`)
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                 ${u[0][3]} \\cdot ${l[3][0]} + ${u[1][3]} \\cdot ${l[3][2]} + ${u[2][3]} \\cdot ${l[3][2]}+ u_{4,4} &= ${lhs} \\\\
+                u_{4,4} &= ${lhs - u[0][3] * l[3][0] - u[1][3] * l[3][1] - u[2][3] * l[3][2]}
+                \\end{align*}$$`)
                 u[3][3] = lhs - u[0][3] * l[3][0] - u[1][3] * l[3][1] - u[2][3] * l[3][2]
-              } else {
-                this.working.steps.push(`$$ \\\\ ${temp[i]} \\\\ ${i} $$`)
               }
             }
           }
         }
-        this.working.steps.push(`Therefore we have 
+      } else if (this.method === 'Crout Factorisation') {
+        for (let i = 0; i < this.n; i++) {
+          for (let j = 0; j < this.n; j++) {
+            if (i === j) {
+              u[i][j] = '1'
+              l[i][j] = `l_{${i + 1},${j + 1}}`
+            } else if (i > j) {
+              l[i][j] = `l_{${i + 1},${j + 1}}`
+              u[i][j] = '0'
+            } else if (i < j) {
+              l[i][j] = '0'
+              u[i][j] = `u_{${i + 1},${j + 1}}`
+            }
+          }
+        }
+        this.working.steps.push(` Denote the L and U matrices by 
+        $$\\\\
+        \\begin{equation}
+            L = ${this.matrixToLatex(l)}  \\hspace{0.35cm} and \\hspace{0.5cm} U = ${this.matrixToLatex(u)}
+        \\end{equation}
+       $$`)
+        this.working.steps.push(`so that the equation $LU = A$ is represented as 
+        $$\\\\
+        \\begin{equation}
+            ${this.matrixToLatex(l)}${this.matrixToLatex(u)} = ${this.matrixToLatex(this.matrix)}
+        \\end{equation}
+       $$`)
+        let temp = []
+        for (let i = 0; i < this.n; i++) {
+          for (let k = 0; k < this.n; k++) {
+            let str = ''
+            for (let j = 0; j < this.n; j++) {
+              if (u[j][k] !== '0' && l[i][j] !== '0') {
+                if (str === '') {
+                  if (u[j][i] === '1') {
+                    str = str + `${l[k][j]}`
+                  } else {
+                    str = str + `${u[j][i]} ${l[k][j]}`
+                  }
+                } else {
+                  if (u[j][i] === '1') {
+                    str = str + `+${l[k][j]}`
+                  } else {
+                    str = str + `+${u[j][i]} ${l[k][j]}`
+                  }
+                }
+              }
+            }
+            temp.push(str)
+          }
+        }
+        console.log(temp)
+        let arr = []
+        for (let k = 0; k < this.n; k++) {
+          for (let j = 0; j < this.n; j++) {
+            arr.push(this.matrix[j][k])
+          }
+        }
+        console.log(arr)
+        for (let i = 0; i < temp.length; i++) {
+          if (temp[i] !== '') {
+            temp[i] = temp[i] + `&=${arr[i]}`
+          }
+        }
+        console.log(temp)
+        this.working.steps.push(`Multiplying the matrix equation and solving for the unknowns in succession gives`)
+        if (this.n === 2) {
+          l[0][0] = this.matrix[0][0]
+          l[1][0] = this.matrix[1][0]
+          for (let i = 0; i < temp.length; i++) {
+            if (temp[i] !== '') {
+              if (i === 0 || i === 1) {
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\end{align*}$$`)
+              } else if (i === 2) {
+                this.working.steps.push(`$$\\begin{align*} ${temp[i]} \\\\
+                ${l[0][0]} \\cdot u_{1,2} &= ${this.matrix[0][1]} \\\\
+                u_{1,2} &= ${this.matrix[0][1] / l[0][0]}
+                \\end{align*}$$`)
+                u[0][1] = this.matrix[0][1] / l[0][0]
+              } else if (i === 3) {
+                this.working.steps.push(`$$\\begin{align*} ${temp[i]} \\\\
+                  ${u[0][1]}\\cdot${l[1][0]} + l_{2,2} &= ${this.matrix[1][1]} \\\\
+                  l_{2,2} &= ${this.matrix[1][1] - u[0][1] * l[1][0]}
+                \\end{align*}$$`)
+                l[1][1] = this.matrix[1][1] - u[0][1] * l[1][0]
+              }
+            }
+          }
+        } else if (this.n === 3) {
+          l[0][0] = this.matrix[0][0]
+          l[1][0] = this.matrix[1][0]
+          l[2][0] = this.matrix[1][0]
+          for (let i = 0; i < temp.length; i++) {
+            if (temp[i] !== '') {
+              if (i === 0 || i === 1 || i === 2) {
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\end{align*}$$`)
+              } else if (i === 3) {
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]}  \\\\
+                ${l[0][0]} \\cdot u_{1,2} &= ${this.matrix[0][1]} \\\\
+                u_{1,2} &= ${this.matrix[0][1] / l[0][0]} 
+                \\end{align*}$$`)
+                u[0][1] = this.matrix[0][1] / l[0][0]
+              } else if (i === 4) {
+                this.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\ 
+                ${u[0][1]} \\cdot ${l[1][0]} + l_{2,2} &= ${this.matrix[1][1]} \\\\
+                l_{2,2} &= ${this.matrix[1][1] - u[0][1] * l[1][0]}
+                \\end{align*}$$`)
+                l[1][1] = this.matrix[1][1] - u[0][1] * l[1][0]
+              } else if (i === 5) {
+                this.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\ 
+                ${u[0][1]} \\cdot ${l[2][0]} + l_{3,2} &= ${this.matrix[2][1]} \\\\
+                l_{3,2} &= ${this.matrix[2][1] - u[0][1] * l[2][0]}
+                \\end{align*}$$`)
+                l[2][1] = this.matrix[2][1] - u[0][1] * l[2][0]
+              } else if (i === 6) {
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]}  \\\\
+                ${l[0][0]} \\cdot u_{1,3} &= ${this.matrix[0][2]} \\\\
+                u_{1,3} &= ${this.matrix[0][2] / l[0][0]} 
+                \\end{align*}$$`)
+                u[0][2] = this.matrix[0][2] / l[0][0]
+              } else if (i === 7) {
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\
+                  ${u[0][2]} \\cdot \\ ${l[1][0]} + ${l[1][1]} \\cdot u_{2,3} &= ${this.matrix[1][2]} \\\\
+                  ${l[1][1]} \\cdot u_{2,3} &= ${this.matrix[1][2] - u[0][2] * l[1][0]} \\\\
+                  u_{2,3} &= ${(this.matrix[1][2] - u[0][2] * l[1][0]) / l[1][1]} 
+                \\end{align*}$$`)
+                u[1][2] = (this.matrix[1][2] - u[0][2] * l[1][0]) / l[1][1]
+              } else {
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\  
+                ${u[0][2]} \\cdot ${l[2][0]} + ${u[1][2]} \\cdot ${l[2][1]} + u_{3,3} &= ${this.matrix[2][2]} \\\\
+                l_{3,3} &= ${this.matrix[2][2] - u[0][2] * l[2][0] - u[1][2] * l[2][1]}
+                \\end{align*}$$`)
+                l[2][2] = this.matrix[2][2] - u[0][2] * l[2][0] - u[1][2] * l[2][1]
+              }
+            }
+          }
+        } else if (this.n === 4) {
+          l[0][0] = this.matrix[0][0]
+          l[1][0] = this.matrix[1][0]
+          l[2][0] = this.matrix[2][0]
+          l[3][0] = this.matrix[3][0]
+          for (let i = 0; i < temp.length; i++) {
+            if (temp[i] !== '') {
+              if (i === 0 || i === 1 || i === 2 || i === 3) {
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\end{align*} $$`)
+              } else if (i === 4) {
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                u_{1,2} &= ${this.matrix[0][1] / l[0][0]}
+                \\end{align*}$$`)
+                u[0][1] = this.matrix[0][1] / l[0][0]
+              } else if (i === 5) {
+                this.working.steps.push(`$$  \\begin{align*} ${temp[i]} \\\\
+                  ${u[0][1]} \\cdot ${l[1][0]} + l_{2,2} &= ${this.matrix[1][1]} \\\\
+                  l_{2,2} &= ${this.matrix[1][1] - u[0][1] * l[1][0]} 
+                \\end{align*}$$`)
+                l[1][1] = this.matrix[1][1] - u[0][1] * l[1][0]
+              } else if (i === 6) {
+                let lhs = this.matrix[2][1]
+                this.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\
+                  ${u[0][1]} \\cdot ${l[2][0]} + l_{3,2} &= ${lhs} \\\\
+                  l_{3,2} &= ${lhs - u[0][1] * l[2][0]} \\\\
+                \\end{align*}$$`)
+                l[2][1] = (lhs - u[0][1] * l[2][0])
+              } else if (i === 7) {
+                let lhs = this.matrix[3][1]
+                this.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\
+                  ${u[0][1]} \\cdot ${l[3][0]} + l_{4,2} &= ${lhs} \\\\
+                  l_{4,2} &= ${lhs - u[0][1] * l[3][0]} \\\\ 
+                \\end{align*}$$`)
+                l[3][1] = (lhs - u[0][1] * l[3][0])
+              } else if (i === 8) {
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                u_{1,3} &= ${this.matrix[0][2] / l[0][0]}
+                \\end{align*}$$`)
+                u[0][2] = this.matrix[0][2] / l[0][0]
+              } else if (i === 9) {
+                this.working.steps.push(`$$  \\begin{align*} ${temp[i]} \\\\
+                  ${u[0][2]} \\cdot ${l[1][0]} + u_{2,3} \\cdot ${l[1][1]} &= ${this.matrix[1][2]} \\\\
+                  ${l[1][1]} \\cdot  u_{2,3} &= ${this.matrix[1][2] - u[0][2] * l[1][0]} \\\\
+                  u_{2,3} &= ${(this.matrix[1][2] - u[0][2] * l[1][0]) / l[1][1]}
+                \\end{align*}$$`)
+                u[1][2] = (this.matrix[1][2] - u[0][2] * l[1][0]) / l[1][1]
+              } else if (i === 10) {
+                let lhs = this.matrix[2][2]
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                 ${u[0][2]} \\cdot ${l[2][0]} + ${u[1][2]} \\cdot ${l[2][1]} + l_{3,3} = ${lhs} \\\\
+                l_{3,3} = ${lhs - u[0][2] * l[2][0] - u[1][2] * l[2][1]}
+                \\end{align*}$$`)
+                l[2][2] = lhs - u[0][2] * l[2][0] - u[1][2] * l[2][1]
+              } else if (i === 11) {
+                let lhs = this.matrix[3][2]
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                 ${u[0][2]} \\cdot ${l[3][0]} + ${u[1][2]} \\cdot ${l[3][1]} + l_{4,3} &= ${lhs} \\\\
+                l_{4,3} &= ${lhs - u[0][2] * l[3][0] - u[1][2] * l[3][1]} \\\\
+                \\end{align*}$$`)
+                l[3][2] = lhs - u[0][2] * l[3][0] - u[1][2] * l[3][1]
+              } else if (i === 12) {
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                u_{1,4} &= ${this.matrix[0][3] / l[0][0]}
+                \\end{align*}$$`)
+                u[0][3] = this.matrix[0][3] / l[0][0]
+              } else if (i === 13) {
+                this.working.steps.push(`$$  \\begin{align*} ${temp[i]} \\\\
+                  ${u[0][3]} \\cdot ${l[1][0]} + ${l[1][1]} \\cdot u_{2,4} &= ${this.matrix[1][3]} \\\\
+                  ${l[1][1]} \\cdot u_{2,4} &= ${this.matrix[1][3] - u[0][3] * l[1][0]} \\\\
+                  u_{2,4} &= ${(this.matrix[1][3] - u[0][3] * l[1][0]) / l[1][1]}
+                \\end{align*}$$`)
+                u[1][3] = (this.matrix[1][3] - u[0][3] * l[1][0]) / l[1][1]
+              } else if (i === 14) {
+                let lhs = this.matrix[2][3]
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                ${u[0][3]} \\cdot ${l[2][0]} + ${u[1][3]} \\cdot ${l[2][1]} + ${l[2][2]}  \\cdot u_{3,4} &= ${lhs} \\\\
+                ${l[2][2]}  \\cdot u_{3,4} &= ${lhs - u[0][3] * l[2][0] - u[1][3] * l[2][1]} \\\\
+                u_{3,4} &= ${(lhs - u[0][3] * l[2][0] - u[1][3] * l[2][1]) / l[2][2]}
+                \\end{align*}$$`)
+                u[2][3] = (lhs - u[0][3] * l[2][0] - u[1][3] * l[2][1]) / l[2][2]
+              } else if (i === 15) {
+                let lhs = this.matrix[3][3]
+                this.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                 ${u[0][3]} \\cdot ${l[3][0]} + ${u[1][3]} \\cdot ${l[3][1]} + ${u[2][3]} \\cdot ${l[3][2]}+ l_{4,4} &= ${lhs} \\\\
+                l_{4,4} &= ${lhs - u[0][3] * l[3][0] - u[1][3] * l[3][1] - u[2][3] * l[3][2]}
+                \\end{align*}$$`)
+                l[3][3] = lhs - u[0][3] * l[3][0] - u[1][3] * l[3][1] - u[2][3] * l[3][2]
+              }
+            }
+          }
+        }
+      }
+
+      this.working.steps.push(`Therefore we have 
         $$\\\\
           \\begin{equation}
-            L = ${this.matrixToLatex(l)}, U = ${this.matrixToLatex(u)} \\hspace{ 0.2cm } and \\hspace{ 0.2cm } A = ${this.matrixToLatex(this.matrix)}
+            L = ${this.matrixToLatex(l)} \\hspace{ 0.2cm } and \\hspace{ 0.2cm } U = ${this.matrixToLatex(u)}
           \\end{equation}
        $$`)
-        this.answer.value = `
-        $$\\\\
+      this.answer.value = `
+        $$
           \\begin{equation}
-            L = ${this.matrixToLatex(l)}, U = ${this.matrixToLatex(u)} \\hspace{ 0.2cm } and \\hspace{ 0.2cm } A = ${this.matrixToLatex(this.matrix)}
+            L = ${this.matrixToLatex(l)}\\hspace{ 0.2cm } and \\hspace{ 0.2cm} U = ${this.matrixToLatex(u)}
           \\end{equation}
         $$`
-        this.$nextTick(() => {
-          window.MathJax.Hub.Queue(['Typeset', window.MathJax.Hub, this.$refs.working])
-        })
-      }
+      this.$nextTick(() => {
+        window.MathJax.Hub.Queue(['Typeset', window.MathJax.Hub, this.$refs.working])
+      })
     },
     generateEmptyMatrix () {
       let emptyMatrix = []
@@ -549,6 +785,22 @@ export default {
             l[i][j] = 0
           } else if (j < i) {
             u[i][j] = 0
+          }
+        }
+      }
+      return multiply(l, u)
+    },
+    generateCroutA () {
+      let l = this.generateMatrix()
+      let u = this.generateMatrix()
+      for (let i = 0; i < this.n; i++) {
+        for (let j = 0; j < this.n; j++) {
+          if (i === j) {
+            u[i][j] = 1
+          } else if (i > j) {
+            u[i][j] = 0
+          } else if (j > i) {
+            l[i][j] = 0
           }
         }
       }
@@ -592,7 +844,11 @@ export default {
     generateQuestion () {
       this.working.steps = []
       this.working.visibility = false
-      this.matrix = this.generateDoolitleA()
+      if (this.method === 'Doolitle Factorisation') {
+        this.matrix = this.generateDoolitleA()
+      } else if (this.method === 'Crout Factorisation') {
+        this.matrix = this.generateCroutA()
+      }
       this.question = `
       Use the ${this.method} to find the $ LU $ factorisation of the matrix $ A $ in which $L$ is a unit lower
       triangular matrix and $U$ is an upper triangular matrix
@@ -605,13 +861,40 @@ export default {
       window.MathJax.Hub.Queue(['Typeset', window.MathJax.Hub, '#questionSolution'])
     },
     savePdf () {
+      let text = ` 
+      \\documentclass[fleqn]{article}
+      \\usepackage{amsmath} 
+      \\setlength{\\mathindent}{0pt} 
+
+      \\topmargin -.5in
+      \\textheight 9in
+      \\oddsidemargin -.25in
+      \\evensidemargin -.25in
+      \\textwidth 7in
+      %opening 
+      \\title{LU Decomposition}
+      \\author{https://ludecomposition.surge.sh}
+      \\date{ \\today}
+      \\begin{document} 
+      \\maketitle
+
+      \\section*{Question}
+      ${this.question.replace(/\$/g, '')}
+      \\section*{Answer}
+      ${this.answer.value.replace(/\$/g, '')}
+      \\section*{Working}
+      \\noindent`
+      this.working.steps.forEach((step, index) => {
+        text = text + step.replace(/\$/g, '')
+        if (index > 2) {
+          text = text + `\\vspace{0.01cm}`
+        }
+      })
+      text = text + `
+      \\end{document}
+      `
       let jsonData = {
-        function: parse(this.niceDisplay(this.funct)).toTex(),
-        author: 'https://limits.surge.sh',
-        title: 'Limits',
-        project: 'Limits',
-        steps: '' + this.working.steps + '',
-        answer: this.answer.value
+        latex: text
       }
       this.$store.dispatch('post/donwloadPdf', jsonData).then(response => {
         let url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))

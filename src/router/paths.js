@@ -5,9 +5,9 @@
  */
 
 export default [{
-    path: '/home',
-    name: 'Home',
-    view: 'HomePage'
+    path: '/example',
+    name: 'example',
+    view: 'ExamplePage'
   },
   {
     path: '/notes',

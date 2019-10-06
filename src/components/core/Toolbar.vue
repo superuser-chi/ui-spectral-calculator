@@ -11,6 +11,7 @@
       scrolling
     >
       <!-- mdbNavbar brand -->
+      <mdb-navbar-brand href="#">Home</mdb-navbar-brand>
       <div class="v-toolbar-title">
         <v-toolbar-title class="tertiary--text font-weight-light">
           <v-btn
@@ -22,29 +23,14 @@
           >
             <v-icon>mdi-view-list</v-icon>
           </v-btn>
-          {{ title }}
         </v-toolbar-title>
       </div>
       <mdb-navbar-toggler>
         <mdb-navbar-nav>
-          <mdb-nav-item to="/">Home</mdb-nav-item>
-          <mdb-nav-item to="/notes">Notes</mdb-nav-item>
+          <mdb-nav-item to="/">Notes</mdb-nav-item>
+          <mdb-nav-item to="/example">Examples</mdb-nav-item>
           <mdb-nav-item to="/tutorial">Tutorial</mdb-nav-item>
-          <mdb-nav-item to="/test">Test</mdb-nav-item>
         </mdb-navbar-nav>
-        <!-- Search form -->
-        <form>
-          <mdb-input
-            type="text"
-            class="text-white"
-            placeholder="Search"
-            aria-label="Search"
-            label
-            nav-input
-            waves
-            waves-fixed
-          />
-        </form>
       </mdb-navbar-toggler>
     </mdb-navbar>
     <!--/.Navbar-->
@@ -86,4 +72,6 @@ export default {
 </script>
 
 <style lang="scss">
+* {
+}
 </style>
