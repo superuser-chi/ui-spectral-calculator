@@ -572,20 +572,20 @@ export default {
             temp.push(str)
           }
         }
-        console.log(temp)
+
         let arr = []
         for (let k = 0; k < this.n; k++) {
           for (let j = 0; j < this.n; j++) {
             arr.push(this.matrix[j][k])
           }
         }
-        console.log(arr)
+
         for (let i = 0; i < temp.length; i++) {
           if (temp[i] !== '') {
             temp[i] = temp[i] + `&=${arr[i]}`
           }
         }
-        console.log(temp)
+  
         this.working.steps.push(`Multiplying the matrix equation and solving for the unknowns in succession gives`)
         if (this.n === 2) {
           l[0][0] = this.matrix[0][0]

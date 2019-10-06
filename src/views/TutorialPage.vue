@@ -6,25 +6,57 @@
         class="mb-md-0 mb-4"
       >
         <mdb-modal
-          :show="showModal"
-          centered
-          @close="showModal = false"
+          :show="pdfConfig"
+          @show="generateTutorial"
+          @close="pdfConfig = false"
+          success
         >
           <mdb-modal-header>
-            <mdb-modal-title>{{ modalTitle }}</mdb-modal-title>
+            <mdb-modal-title>Pdf Configuration</mdb-modal-title>
           </mdb-modal-header>
-          <mdb-modal-body>
-            {{ modalMessage }}
+          <mdb-modal-body class="text-center">
+            <section>
+              <div class="custom-control custom-switch mr-5">
+                <input
+                  id="answerSwitch"
+                  v-model="showAnswers"
+                  type="checkbox"
+                  class="custom-control-input"
+                  checked
+                >
+                <label
+                  class="custom-control-label"
+                  for="answerSwitch"
+                >Answer</label>
+              </div>
+              <div class="custom-control custom-switch">
+                <input
+                  id="workingSwitch"
+                  v-model="showSteps"
+                  type="checkbox"
+                  class="custom-control-input"
+                >
+                <label
+                  class="custom-control-label"
+                  for="workingSwitch"
+                >Show steps</label>
+              </div>
+            </section>
           </mdb-modal-body>
-          <mdb-modal-footer>
+          <mdb-modal-footer center>
             <mdb-btn
-              color="danger"
-              @click.native="showModal = false"
-            >Close</mdb-btn>
+              color="success"
+              @click="savePdf"
+            >Generate PDf
+            </mdb-btn>
+            <mdb-btn
+              outline="danger"
+              @click="pdfConfig = false"
+            >Cancel</mdb-btn>
           </mdb-modal-footer>
         </mdb-modal>
         <h2 class="secondary-heading mb-3">Tutorial</h2>
-        <p>This tutorial is meant to test your understanding on Limits
+        <p>This tutorial is meant to test your understanding on LU decomposition
         </p>
         <section class="preview">
           <div
@@ -71,7 +103,7 @@
                       />
                     </v-col>
                   </v-row>
-                  <v-row>
+                  <v-row class="mt-5">
                     <v-col cols="12">
                       <header>Sizes:</header>
                     </v-col>
@@ -155,8 +187,8 @@
               </v-form>
             </section>
             <section
-              v-show="tutorial"
               v-for="(question, index) in questions"
+              v-show="tutorial"
               :key="index"
               class="preview mt-5"
             >
@@ -226,7 +258,10 @@
         </section>
       </mdb-col>
     </mdb-row>
-    <div class="icon-container">
+    <div
+      class="icon-container"
+      v-show="tutorial"
+    >
       <v-btn
         id="btnPdf"
         color="blue"
@@ -243,7 +278,7 @@
         color="pink"
         dark
         fab
-        @click.native="savePdf"
+        @click.native="showPdfConfig"
       >
         <v-icon>mdi-file-pdf</v-icon>
       </v-btn>
@@ -289,11 +324,11 @@ export default {
       size2: { visibility: true, total: 5 },
       size3: { visibility: true, total: 5 },
       size4: { visibility: true, total: 5 },
-      tutorial: false
+      tutorial: false,
+      showAnswers: true,
+      showSteps: true,
+      pdfConfig: false
     }
-  },
-  created () {
-    this.renderMathJax()
   },
   watch: {
     method () {
@@ -308,6 +343,9 @@ export default {
     'size4.visibility' () {
       this.hideTutorial()
     }
+  },
+  created () {
+    this.renderMathJax()
   },
   mounted: function () {
     this.toggleLoader(false)
@@ -332,7 +370,6 @@ export default {
       }
       this.showTutorial()
       this.renderMathJax()
-      this.toggleLoader(false)
     },
     generateQuestionAndSolution (index, size, method) {
       let question = {
@@ -354,6 +391,7 @@ export default {
 
       question = this.generateQuestion(question)
       question = this.solve(question)
+      this.renderMathJax()
       return question
     },
     generateQuestion (question) {
@@ -374,49 +412,64 @@ export default {
       return question
     },
     savePdf () {
-      let text = ` 
+      this.hidePdfConfig()
+      let text = `
       \\documentclass[fleqn]{article}
-      \\usepackage{amsmath} 
-      \\setlength{\\mathindent}{0pt} 
+      \\usepackage{amsmath}
+      \\setlength{\\mathindent}{0pt}
       \\topmargin -.5in
       \\textheight 9in
       \\oddsidemargin -.25in
       \\evensidemargin -.25in
       \\textwidth 7in
 
-      %opening 
+      %opening
       \\title{Limits}
       \\author{https://limits.surge.sh}
       \\date{ \\today}
-      \\begin{document} 
+      \\begin{document}
       \\maketitle
       \\section*{Questions}
       \\noindent
       \\begin{enumerate}
       `
       this.questions.forEach((question, i) => {
-        text += `      
+        text += `
         \\item ${question.question.replace(/\$/g, '')} \\\\
       `
       })
-      text += `
-      \\end{enumerate}
-      \\section*{Solutions}
-      \\begin{enumerate}`
-      this.questions.forEach((question, i) => {
+      text += `\\end{enumerate}`
+      if (this.showAnswers || this.showSteps) {
         text += `
-        \\item{
-         ${question.answer.value.replace(/\$/g, '')}
-        \\subsection*{Working}
-        \\noindent
-        `
-        question.working.steps.forEach((step, index) => {
-          text = text + step.replace(/\$/g, '')
+          \\section*{Solutions}
+          \\begin{enumerate}`
+        this.questions.forEach((question, i) => {
+          if (this.showAnswers) {
+            text += `
+              \\item{
+              ${question.answer.value.replace(/\$/g, '')}
+              `
+            if (this.showSteps) {
+              text += `
+                \\subsection*{Working}
+                \\noindent`
+              question.working.steps.forEach((step, index) => {
+                text = text + step.replace(/\$/g, '')
+              })
+            }
+            text = text + `}`
+          } else if (this.showSteps) {
+            text += `
+            \\item{`
+            question.working.steps.forEach((step, index) => {
+              text = text + step.replace(/\$/g, '')
+            })
+            text = text + `}`
+          }
         })
-        text = text + `}`
-      })
+        text = text + `\\end{enumerate}`
+      }
       text = text + `
-      \\end{enumerate}
       \\end{document}
       `
       let jsonData = {
@@ -437,28 +490,28 @@ export default {
       })
     },
     saveTex () {
-      let text = ` 
+      let text = `
       \\documentclass[fleqn]{article}
-      \\usepackage{amsmath} 
-      \\setlength{\\mathindent}{0pt} 
+      \\usepackage{amsmath}
+      \\setlength{\\mathindent}{0pt}
       \\topmargin -.5in
       \\textheight 9in
       \\oddsidemargin -.25in
       \\evensidemargin -.25in
       \\textwidth 7in
 
-      %opening 
+      %opening
       \\title{Limits}
       \\author{https://limits.surge.sh}
       \\date{ \\today}
-      \\begin{document} 
+      \\begin{document}
       \\maketitle
       \\section*{Questions}
       \\noindent
       \\begin{enumerate}
       `
       this.questions.forEach((question, i) => {
-        text += `      
+        text += `
         \\item Use the limit definition to find $\\frac{df}{dx}$ when $f(x) = ${question.funct}$ \\\\
       `
       })
@@ -531,13 +584,13 @@ export default {
             }
           }
         }
-        question.working.steps.push(` Denote the L and U matrices by 
+        question.working.steps.push(` Denote the L and U matrices by
         $$\\\\
         \\begin{equation*}
             L = ${this.matrixToLatex(l)}  \\hspace{0.35cm} and \\hspace{0.5cm} U = ${this.matrixToLatex(u)}
         \\end{equation*}
        $$`)
-        question.working.steps.push(`so that the equation $LU = A$ is represented as 
+        question.working.steps.push(`so that the equation $LU = A$ is represented as
         $$\\\\
         \\begin{equation*}
             ${this.matrixToLatex(l)}${this.matrixToLatex(u)} = ${this.matrixToLatex(question.matrix)}
@@ -609,17 +662,17 @@ export default {
               if (i === 0 || i === 3 || i === 6) {
                 question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\end{align*}$$`)
               } else if (i === 1) {
-                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ l_{2,1} &= ${question.matrix[1][0] / question.matrix[0][0]} 
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ l_{2,1} &= ${question.matrix[1][0] / question.matrix[0][0]}
                 \\end{align*}$$`)
                 l[1][0] = question.matrix[1][0] / question.matrix[0][0]
               } else if (i === 2) {
-                question.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\ l_{3,1} &= ${question.matrix[2][0] / question.matrix[0][0]} 
+                question.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\ l_{3,1} &= ${question.matrix[2][0] / question.matrix[0][0]}
                 \\end{align*}$$`)
                 l[2][0] = question.matrix[2][0] / question.matrix[0][0]
               } else if (i === 4) {
                 question.working.steps.push(`$$  \\begin{align*} ${temp[i]} \\\\
                   ${u[0][1]} \\cdot ${l[1][0]} + u_{2,2} &= ${question.matrix[1][1]} \\\\
-                  u_{2,2} &= ${question.matrix[1][1] - u[0][1] * l[1][0]} 
+                  u_{2,2} &= ${question.matrix[1][1] - u[0][1] * l[1][0]}
                 \\end{align*}$$`)
                 u[1][1] = question.matrix[1][1] - u[0][1] * l[1][0]
               } else if (i === 5) {
@@ -633,11 +686,11 @@ export default {
               } else if (i === 7) {
                 question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\
                   ${u[0][2]} \\cdot \\ ${l[1][0]} + u_{2,3} &= ${question.matrix[1][2]} \\\\
-                  u_{2,3} &= ${question.matrix[1][2] - u[0][2] * l[1][0]} 
+                  u_{2,3} &= ${question.matrix[1][2] - u[0][2] * l[1][0]}
                 \\end{align*}$$`)
                 u[1][2] = question.matrix[1][2] - u[0][2] * l[1][0]
               } else {
-                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\  
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\
                 ${u[0][2]} \\cdot ${l[2][0]} + ${u[1][2]} \\cdot ${l[2][1]} + u_{3,3} &= ${question.matrix[2][2]} \\\\
                 u_{3,3} &= ${question.matrix[2][2] - u[0][2] * l[2][0] - u[1][2] * l[2][1]}
                 \\end{align*}$$`)
@@ -655,7 +708,7 @@ export default {
               if (i === 0 || i === 4 || i === 8 || i === 12) {
                 question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\end{align*} $$`)
               } else if (i === 1) {
-                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ l_{2,1} &= ${question.matrix[1][0] / question.matrix[0][0]} 
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ l_{2,1} &= ${question.matrix[1][0] / question.matrix[0][0]}
                 \\end{align*}$$`)
                 l[1][0] = question.matrix[1][0] / question.matrix[0][0]
               } else if (i === 2) {
@@ -667,7 +720,7 @@ export default {
               } else if (i === 5) {
                 question.working.steps.push(`$$  \\begin{align*} ${temp[i]} \\\\
                   ${u[0][1]} \\cdot ${l[1][0]} + u_{2,2} &= ${question.matrix[1][1]} \\\\
-                  u_{2,2} &= ${question.matrix[1][1] - u[0][1] * l[1][0]} 
+                  u_{2,2} &= ${question.matrix[1][1] - u[0][1] * l[1][0]}
                 \\end{align*}$$`)
                 u[1][1] = question.matrix[1][1] - u[0][1] * l[1][0]
               } else if (i === 6) {
@@ -675,7 +728,7 @@ export default {
                 question.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\
                   ${u[0][1]} \\cdot ${l[2][0]} + ${u[1][1]}\\cdot l_{3,2} &= ${lhs} \\\\
                   ${u[1][1]} \\cdot l_{3,2} &= ${lhs - u[0][1] * l[2][0]} \\\\
-                  l_{3,2} &= ${(lhs - u[0][1] * l[2][0]) / u[1][1]} 
+                  l_{3,2} &= ${(lhs - u[0][1] * l[2][0]) / u[1][1]}
                 \\end{align*}$$`)
                 l[2][1] = (lhs - u[0][1] * l[2][0]) / u[1][1]
               } else if (i === 7) {
@@ -683,7 +736,7 @@ export default {
                 question.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\
                   ${u[0][1]} \\cdot ${l[3][0]} + ${u[1][1]}\\cdot l_{4,2} &= ${lhs} \\\\
                   ${u[1][1]} \\cdot l_{4,2} &= ${lhs - u[0][1] * l[3][0]} \\\\
-                  l_{4,2} &= ${(lhs - u[0][1] * l[3][0]) / u[1][1]} 
+                  l_{4,2} &= ${(lhs - u[0][1] * l[3][0]) / u[1][1]}
                 \\end{align*}$$`)
                 l[3][1] = (lhs - u[0][1] * l[3][0]) / u[1][1]
               } else if (i === 9) {
@@ -694,14 +747,14 @@ export default {
                 u[1][2] = question.matrix[1][2] - u[0][2] * l[1][0]
               } else if (i === 10) {
                 let lhs = question.matrix[2][2]
-                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\
                  ${u[0][2]} \\cdot ${l[2][0]} + ${u[1][2]} \\cdot ${l[2][1]} + u_{3,3} = ${lhs} \\\\
                 u_{3,3} = ${lhs - u[0][2] * l[2][0] - u[1][2] * l[2][1]}
                 \\end{align*}$$`)
                 u[2][2] = lhs - u[0][2] * l[2][0] - u[1][2] * l[2][1]
               } else if (i === 11) {
                 let lhs = question.matrix[3][2]
-                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\
                  ${u[0][2]} \\cdot ${l[3][0]} + ${u[1][2]} \\cdot ${l[3][1]} + ${u[2][2]} \\cdot l_{4,3} &= ${lhs} \\\\
                 ${u[2][2]} \\cdot l_{4,3} &= ${lhs - u[0][2] * l[3][0] - u[1][2] * l[3][1]} \\\\
                 l_{4,3} &= ${(lhs - u[0][2] * l[3][0] - u[1][2] * l[3][1]) / u[2][2]}
@@ -710,19 +763,19 @@ export default {
               } else if (i === 13) {
                 question.working.steps.push(`$$  \\begin{align*} ${temp[i]} \\\\
                   ${u[0][3]} \\cdot ${l[1][0]} + u_{2,4} &= ${question.matrix[1][1]} \\\\
-                  u_{2,4} &= ${question.matrix[1][3] - u[0][3] * l[1][0]} 
+                  u_{2,4} &= ${question.matrix[1][3] - u[0][3] * l[1][0]}
                 \\end{align*}$$`)
                 u[1][3] = question.matrix[1][3] - u[0][3] * l[1][0]
               } else if (i === 14) {
                 let lhs = question.matrix[2][3]
-                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\
                  ${u[0][3]} \\cdot ${l[2][0]} + ${u[1][3]} \\cdot ${l[2][1]} + u_{3,4} &= ${lhs} \\\\
                 u_{3,4} &= ${lhs - u[0][3] * l[2][0] - u[1][3] * l[2][1]}
                 \\end{align*}$$`)
                 u[2][3] = lhs - u[0][3] * l[2][0] - u[1][3] * l[2][1]
               } else if (i === 15) {
                 let lhs = question.matrix[3][3]
-                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\
                  ${u[0][3]} \\cdot ${l[3][0]} + ${u[1][3]} \\cdot ${l[3][2]} + ${u[2][3]} \\cdot ${l[3][2]}+ u_{4,4} &= ${lhs} \\\\
                 u_{4,4} &= ${lhs - u[0][3] * l[3][0] - u[1][3] * l[3][1] - u[2][3] * l[3][2]}
                 \\end{align*}$$`)
@@ -746,13 +799,13 @@ export default {
             }
           }
         }
-        question.working.steps.push(` Denote the L and U matrices by 
+        question.working.steps.push(` Denote the L and U matrices by
         $$\\\\
         \\begin{equation*}
             L = ${this.matrixToLatex(l)}  \\hspace{0.35cm} and \\hspace{0.5cm} U = ${this.matrixToLatex(u)}
         \\end{equation*}
        $$`)
-        question.working.steps.push(`so that the equation $LU = A$ is represented as 
+        question.working.steps.push(`so that the equation $LU = A$ is represented as
         $$\\\\
         \\begin{equation*}
             ${this.matrixToLatex(l)}${this.matrixToLatex(u)} = ${this.matrixToLatex(question.matrix)}
@@ -827,17 +880,17 @@ export default {
               } else if (i === 3) {
                 question.working.steps.push(`$$ \\begin{align*} ${temp[i]}  \\\\
                 ${l[0][0]} \\cdot u_{1,2} &= ${question.matrix[0][1]} \\\\
-                u_{1,2} &= ${question.matrix[0][1] / l[0][0]} 
+                u_{1,2} &= ${question.matrix[0][1] / l[0][0]}
                 \\end{align*}$$`)
                 u[0][1] = question.matrix[0][1] / l[0][0]
               } else if (i === 4) {
-                question.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\ 
+                question.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\
                 ${u[0][1]} \\cdot ${l[1][0]} + l_{2,2} &= ${question.matrix[1][1]} \\\\
                 l_{2,2} &= ${question.matrix[1][1] - u[0][1] * l[1][0]}
                 \\end{align*}$$`)
                 l[1][1] = question.matrix[1][1] - u[0][1] * l[1][0]
               } else if (i === 5) {
-                question.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\ 
+                question.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\
                 ${u[0][1]} \\cdot ${l[2][0]} + l_{3,2} &= ${question.matrix[2][1]} \\\\
                 l_{3,2} &= ${question.matrix[2][1] - u[0][1] * l[2][0]}
                 \\end{align*}$$`)
@@ -845,18 +898,18 @@ export default {
               } else if (i === 6) {
                 question.working.steps.push(`$$ \\begin{align*} ${temp[i]}  \\\\
                 ${l[0][0]} \\cdot u_{1,3} &= ${question.matrix[0][2]} \\\\
-                u_{1,3} &= ${question.matrix[0][2] / l[0][0]} 
+                u_{1,3} &= ${question.matrix[0][2] / l[0][0]}
                 \\end{align*}$$`)
                 u[0][2] = question.matrix[0][2] / l[0][0]
               } else if (i === 7) {
                 question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\
                   ${u[0][2]} \\cdot \\ ${l[1][0]} + ${l[1][1]} \\cdot u_{2,3} &= ${question.matrix[1][2]} \\\\
                   ${l[1][1]} \\cdot u_{2,3} &= ${question.matrix[1][2] - u[0][2] * l[1][0]} \\\\
-                  u_{2,3} &= ${(question.matrix[1][2] - u[0][2] * l[1][0]) / l[1][1]} 
+                  u_{2,3} &= ${(question.matrix[1][2] - u[0][2] * l[1][0]) / l[1][1]}
                 \\end{align*}$$`)
                 u[1][2] = (question.matrix[1][2] - u[0][2] * l[1][0]) / l[1][1]
               } else {
-                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\  
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\
                 ${u[0][2]} \\cdot ${l[2][0]} + ${u[1][2]} \\cdot ${l[2][1]} + u_{3,3} &= ${question.matrix[2][2]} \\\\
                 l_{3,3} &= ${question.matrix[2][2] - u[0][2] * l[2][0] - u[1][2] * l[2][1]}
                 \\end{align*}$$`)
@@ -874,14 +927,14 @@ export default {
               if (i === 0 || i === 1 || i === 2 || i === 3) {
                 question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\end{align*} $$`)
               } else if (i === 4) {
-                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\
                 u_{1,2} &= ${question.matrix[0][1] / l[0][0]}
                 \\end{align*}$$`)
                 u[0][1] = question.matrix[0][1] / l[0][0]
               } else if (i === 5) {
                 question.working.steps.push(`$$  \\begin{align*} ${temp[i]} \\\\
                   ${u[0][1]} \\cdot ${l[1][0]} + l_{2,2} &= ${question.matrix[1][1]} \\\\
-                  l_{2,2} &= ${question.matrix[1][1] - u[0][1] * l[1][0]} 
+                  l_{2,2} &= ${question.matrix[1][1] - u[0][1] * l[1][0]}
                 \\end{align*}$$`)
                 l[1][1] = question.matrix[1][1] - u[0][1] * l[1][0]
               } else if (i === 6) {
@@ -895,11 +948,11 @@ export default {
                 let lhs = question.matrix[3][1]
                 question.working.steps.push(`$$ \\begin{align*}  ${temp[i]} \\\\
                   ${u[0][1]} \\cdot ${l[3][0]} + l_{4,2} &= ${lhs} \\\\
-                  l_{4,2} &= ${lhs - u[0][1] * l[3][0]} \\\\ 
+                  l_{4,2} &= ${lhs - u[0][1] * l[3][0]} \\\\
                 \\end{align*}$$`)
                 l[3][1] = (lhs - u[0][1] * l[3][0])
               } else if (i === 8) {
-                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\
                 u_{1,3} &= ${question.matrix[0][2] / l[0][0]}
                 \\end{align*}$$`)
                 u[0][2] = question.matrix[0][2] / l[0][0]
@@ -912,20 +965,20 @@ export default {
                 u[1][2] = (question.matrix[1][2] - u[0][2] * l[1][0]) / l[1][1]
               } else if (i === 10) {
                 let lhs = question.matrix[2][2]
-                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\
                  ${u[0][2]} \\cdot ${l[2][0]} + ${u[1][2]} \\cdot ${l[2][1]} + l_{3,3} = ${lhs} \\\\
                 l_{3,3} = ${lhs - u[0][2] * l[2][0] - u[1][2] * l[2][1]}
                 \\end{align*}$$`)
                 l[2][2] = lhs - u[0][2] * l[2][0] - u[1][2] * l[2][1]
               } else if (i === 11) {
                 let lhs = question.matrix[3][2]
-                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\
                  ${u[0][2]} \\cdot ${l[3][0]} + ${u[1][2]} \\cdot ${l[3][1]} + l_{4,3} &= ${lhs} \\\\
                 l_{4,3} &= ${lhs - u[0][2] * l[3][0] - u[1][2] * l[3][1]} \\\\
                 \\end{align*}$$`)
                 l[3][2] = lhs - u[0][2] * l[3][0] - u[1][2] * l[3][1]
               } else if (i === 12) {
-                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\
                 u_{1,4} &= ${question.matrix[0][3] / l[0][0]}
                 \\end{align*}$$`)
                 u[0][3] = question.matrix[0][3] / l[0][0]
@@ -938,7 +991,7 @@ export default {
                 u[1][3] = (question.matrix[1][3] - u[0][3] * l[1][0]) / l[1][1]
               } else if (i === 14) {
                 let lhs = question.matrix[2][3]
-                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\
                 ${u[0][3]} \\cdot ${l[2][0]} + ${u[1][3]} \\cdot ${l[2][1]} + ${l[2][2]}  \\cdot u_{3,4} &= ${lhs} \\\\
                 ${l[2][2]}  \\cdot u_{3,4} &= ${lhs - u[0][3] * l[2][0] - u[1][3] * l[2][1]} \\\\
                 u_{3,4} &= ${(lhs - u[0][3] * l[2][0] - u[1][3] * l[2][1]) / l[2][2]}
@@ -946,7 +999,7 @@ export default {
                 u[2][3] = (lhs - u[0][3] * l[2][0] - u[1][3] * l[2][1]) / l[2][2]
               } else if (i === 15) {
                 let lhs = question.matrix[3][3]
-                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\ 
+                question.working.steps.push(`$$ \\begin{align*} ${temp[i]} \\\\
                  ${u[0][3]} \\cdot ${l[3][0]} + ${u[1][3]} \\cdot ${l[3][1]} + ${u[2][3]} \\cdot ${l[3][2]}+ l_{4,4} &= ${lhs} \\\\
                 l_{4,4} &= ${lhs - u[0][3] * l[3][0] - u[1][3] * l[3][1] - u[2][3] * l[3][2]}
                 \\end{align*}$$`)
@@ -957,7 +1010,7 @@ export default {
         }
       }
 
-      question.working.steps.push(`Therefore we have 
+      question.working.steps.push(`Therefore we have
         $$\\\\
           \\begin{equation*}
             L = ${this.matrixToLatex(l)} \\hspace{ 0.2cm } and \\hspace{ 0.2cm } U = ${this.matrixToLatex(u)}
@@ -1051,6 +1104,12 @@ export default {
     },
     showTutorial () {
       this.tutorial = true
+    },
+    hidePdfConfig () {
+      this.pdfConfig = false
+    },
+    showPdfConfig () {
+      this.pdfConfig = true
     }
   }
 }
