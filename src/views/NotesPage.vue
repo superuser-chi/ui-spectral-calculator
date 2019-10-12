@@ -357,66 +357,68 @@
             $$
             Given any matrix A, the naive Gaussian elimination method can be used to decompose
             the matrix to LU form as follows:
-            <h3 class="h3 mt-5">step 1</h3>
-            $$
-            \begin{array}{cc}
-            R_2 → R_2 − 2R_1 \\
-            R_3 → R_3 + R_1 \\
-            R_4 → R_4 − 2R_1 \\
-            \end{array}
-            \begin{bmatrix}
-            2 & 1 & −1 & 2 \\
-            0 & 3 & −1 & 2 \\
-            0 & 6 & −3 & 8 \\
-            0 & 9 & −2 & 4 \\
-            \end{bmatrix}
-            $$
-            $$
-            M_1 =
-            \begin{bmatrix}
-            1 & 0 & 0 & 0 \\
-            −2 & 1 & 0 & 0 \\
-            1 & 0 & 1 & 0 \\
-            −2 & 0 & 0 & 1 \\
-            \end{bmatrix}
-            ,M_1^{−1} =
-            \begin{bmatrix}
-            1 & 0 & 0 & 0 \\
-            2 & 1 & 0 & 0 \\
-            −1 & 0 & 1 & 0 \\
-            2 & 0 & 0 & 1 \\
-            \end{bmatrix}
-            $$
-            <h3 class="h3 mt-5">step 2</h3>
-            $$
-            \begin{array}{cc}
-            R_3 → R_3 − 2R_2 \\
-            R_4 → R_4 − 3R_2 \\
-            \end{array}
-            \begin{bmatrix}
-            2 & 1 & −1 & 2 \\
-            0 & 3 & −1 & 2 \\
-            0 & 0 & −1 & 4 \\
-            0 & 0 & 1 & −2 \\
-            \end{bmatrix}
-            $$
-            $$
-            M2 =
-            \begin{bmatrix}
-            1 & 0 & 0 & 0 \\
-            0 & 1 & 0 & 0 \\
-            0 & −2 & 1 & 0 \\
-            0 & −3 & 0 & 1 \\
-            \end{bmatrix}
-            , M_2^{−1} =
-            \begin{bmatrix}
-            1 & 0 & 0 & 0 \\
-            0 & 1 & 0 & 0 \\
-            0 & 2 & 1 & 0 \\
-            0 & 3 & 0 & 1 \\
-            \end{bmatrix}
-            $$
-            <h3 class="h3 mt-5">step 3</h3>
+          </p>
+          <h3 class="h3 mt-5">step 1</h3>
+          $$
+          \begin{array}{cc}
+          R_2 → R_2 − 2R_1 \\
+          R_3 → R_3 + R_1 \\
+          R_4 → R_4 − 2R_1 \\
+          \end{array}
+          \begin{bmatrix}
+          2 & 1 & −1 & 2 \\
+          0 & 3 & −1 & 2 \\
+          0 & 6 & −3 & 8 \\
+          0 & 9 & −2 & 4 \\
+          \end{bmatrix}
+          $$
+          $$
+          M_1 =
+          \begin{bmatrix}
+          1 & 0 & 0 & 0 \\
+          −2 & 1 & 0 & 0 \\
+          1 & 0 & 1 & 0 \\
+          −2 & 0 & 0 & 1 \\
+          \end{bmatrix}
+          ,M_1^{−1} =
+          \begin{bmatrix}
+          1 & 0 & 0 & 0 \\
+          2 & 1 & 0 & 0 \\
+          −1 & 0 & 1 & 0 \\
+          2 & 0 & 0 & 1 \\
+          \end{bmatrix}
+          $$
+          <h3 class="h3 mt-5">step 2</h3>
+          $$
+          \begin{array}{cc}
+          R_3 → R_3 − 2R_2 \\
+          R_4 → R_4 − 3R_2 \\
+          \end{array}
+          \begin{bmatrix}
+          2 & 1 & −1 & 2 \\
+          0 & 3 & −1 & 2 \\
+          0 & 0 & −1 & 4 \\
+          0 & 0 & 1 & −2 \\
+          \end{bmatrix}
+          $$
+          $$
+          M2 =
+          \begin{bmatrix}
+          1 & 0 & 0 & 0 \\
+          0 & 1 & 0 & 0 \\
+          0 & −2 & 1 & 0 \\
+          0 & −3 & 0 & 1 \\
+          \end{bmatrix}
+          , M_2^{−1} =
+          \begin{bmatrix}
+          1 & 0 & 0 & 0 \\
+          0 & 1 & 0 & 0 \\
+          0 & 2 & 1 & 0 \\
+          0 & 3 & 0 & 1 \\
+          \end{bmatrix}
+          $$
+          <h3 class="h3 mt-5">step 3</h3>
+          <p class="lead">
             $$
             \begin{array}{cc}
             R_4 → R_4 + R_3 \\
@@ -528,7 +530,7 @@
 </template>
 
 <script>
-import {  mdbContainer, mdbRow, mdbCol, mdbDropdownItem, mdbModal, mdbModalHeader,
+import {  mdbContainer, mdbRow, mdbCol, mdbModal, mdbModalHeader,
   mdbModalTitle, mdbModalBody, mdbBtn, mdbModalFooter} from 'mdbvue'
 import Loading from 'vue-loading-overlay'
 import 'vue-loading-overlay/dist/vue-loading.css'
@@ -555,7 +557,7 @@ export default {
       show: false,
       showModal: false,
       modalTitle: undefined,
-      modalMessage: undefined,
+      modalMessage: undefined
     }
   },
   mounted: function () {

@@ -6,7 +6,8 @@ let headers = {
   'Content-Type': 'application/json',
   'Accept': 'application/json'
 }
-
+let url = 'https://pdftexapi.pythonanywhere.com/'
+// let url = 'http://127.0.0.1:5000/'
 export default {
 
   // eslint-disable-next-line space-before-function-paren
@@ -16,7 +17,7 @@ export default {
     return new Promise((resolve, reject) => {
       console.log(post)
       axios
-        .post('http://127.0.0.1:5000/generate-pdf', post, {
+        .post(url + 'generate-pdf', post, {
           responseType: 'arraybuffer'
         }, {
           headers: headers
@@ -37,9 +38,8 @@ export default {
     commit
   }, post) {
     return new Promise((resolve, reject) => {
-      console.log(post)
       axios
-        .post('http://127.0.0.1:5000/generate-tex', post, {
+        .post(url + 'generate-tex', post, {
           responseType: 'arraybuffer'
         }, {
           headers: headers

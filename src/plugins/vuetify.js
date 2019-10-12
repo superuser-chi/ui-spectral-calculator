@@ -1,3 +1,4 @@
+/* eslint-disable eol-last */
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import theme from './theme'

@@ -23,7 +23,6 @@ import 'mdbvue/build/css/mdb.css'
 import 'vue-material-design-icons/styles.css'
 import VueMathjax from 'vue-mathjax'
 import './registerServiceWorker'
-
 // Sync store with router
 sync(store, router)
 
@@ -36,5 +35,5 @@ new Vue({
   router,
   store,
   render: h => h(App)
-// eslint-disable-next-line eol-last
+  // eslint-disable-next-line eol-last
 }).$mount('#app')

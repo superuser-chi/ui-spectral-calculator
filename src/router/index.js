@@ -31,7 +31,7 @@ Vue.use(Router)
 const router = new Router({
   routes: paths.map(path => route(path.path, path.view, path.name)).concat([{
     path: '*',
-    redirect: '/notes'
+    redirect: '/example'
   }]),
   scrollBehavior(to, from, savedPosition) {
     if (savedPosition) {
