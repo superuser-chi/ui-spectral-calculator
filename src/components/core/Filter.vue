@@ -61,33 +61,33 @@
 
 <script>
 // Utilities
-import { mapMutations, mapState } from "vuex";
+import { mapMutations, mapState } from 'vuex'
 
 export default {
   data: () => ({
-    colors: ["primary", "info", "success", "warning", "danger"],
+    colors: ['primary', 'info', 'success', 'warning', 'danger'],
     images: [
-      "./img/images/sidebar-1.23832d31.jpg",
-      "./img/images/sidebar-2.32103624.jpg",
-      "./img/images/sidebar-3.3a54f533.jpg",
-      "./img/images/sidebar-4.3b7e38ed.jpg"
+      './img/images/sidebar-1.23832d31.jpg',
+      './img/images/sidebar-2.32103624.jpg',
+      './img/images/sidebar-3.3a54f533.jpg',
+      './img/images/sidebar-4.3b7e38ed.jpg'
     ]
   }),
 
   computed: {
-    ...mapState("app", ["image", "color"]),
+    ...mapState('app', ['image', 'color']),
     color () {
-      return this.$store.state.app.color;
+      return this.$store.state.app.color
     }
   },
 
   methods: {
-    ...mapMutations("app", ["setImage"]),
+    ...mapMutations('app', ['setImage']),
     setColor (color) {
-      this.$store.state.app.color = color;
+      this.$store.state.app.color = color
     }
   }
-};
+}
 </script>
 
 <style lang="scss">

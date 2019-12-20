@@ -1,9 +1,20 @@
 <template>
+  <!-- App.vue -->
+
   <v-app>
-    <template>
+
+    <core-drawer />
+
+    <v-app-bar app>
       <core-toolbar />
-    </template>
-    <core-view />
+    </v-app-bar>
+
+    <!-- Sizes your content based upon application components -->
+    <v-content>
+      <!-- If using vue-router -->
+      <core-view />
+    </v-content>
+
   </v-app>
 </template>
 
@@ -12,9 +23,10 @@
 .v-datatable thead th.column.sortable i {
   vertical-align: unset;
 }
-
+.v-content {
+  padding: 0 !important;
+}
 .theme--light.application {
   background: white;
-  color: rgba(0, 0, 0, 0.87);
 }
 </style>

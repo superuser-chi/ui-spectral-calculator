@@ -1,5 +1,5 @@
 module.exports = {
-  baseUrl: '',
+  publicPath: '',
   pwa: {
     workboxOptions: {
       skipWaiting: true
@@ -13,6 +13,14 @@ module.exports = {
         ws: true,
         pathRewrite: {
           '^/api': ''
+        }
+      },
+      '/faas': {
+        target: 'http://127.0.0.1:8080/function/',
+        changeOrigin: true,
+        ws: true,
+        pathRewrite: {
+          '^/faas': ''
         }
       }
     }

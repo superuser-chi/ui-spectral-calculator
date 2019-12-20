@@ -1,7 +1,7 @@
 // https://vuex.vuejs.org/en/mutations.html
 
 export default {
-  UPDATE_USER(state, payload) {
+  UPDATE_USER (state, payload) {
     state.user.authorization = payload.Authorization
     state.user.public_id = payload.public_id
     state.user.physical_address = payload.physical_address

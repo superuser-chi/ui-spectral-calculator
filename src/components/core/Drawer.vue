@@ -1,57 +1,58 @@
 <template>
-  <v-navigation-drawer
-    id="app-drawer"
-    v-model="inputValue"
-    app
-    dark
-    floating
-    persistent
-    mobile-break-point="991"
-    width="260"
-  >
-    <v-img
-      :src="image"
-      height="100%"
-      class="avatar"
+  <v-card dark>
+    <v-navigation-drawer
+      :clipped="clipped"
+      v-model="drawer"
+      enable-resize-watcher
+      app
+      dark
+      temporary
+      class="primary"
     >
-      <v-layout
-        class="fill-height"
-        tag="v-list"
-        column
+      <v-img
+        :src="image"
+        height="100%"
+        class="avatar"
       >
-        <v-list-tile avatar>
-          <v-list-tile-avatar color="white">
-            <v-img
-              :src="logo"
-              height="34"
-              contain
-            />
-          </v-list-tile-avatar>
-          <v-list-tile-title class="title">MaizeIt IS</v-list-tile-title>
-        </v-list-tile>
-        <v-divider />
-        <v-list-tile
-          v-for="(link, i) in links"
-          :key="i"
-          :to="link.to"
-          :active-class="color"
-          avatar
-          class="v-list-item"
+        <v-layout
+          class="fill-height"
+          tag="v-list"
+          column
         >
-          <v-list-tile-action>
-            <v-icon>{{ link.icon }}</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-title v-text="link.text" />
-        </v-list-tile>
-        <v-list-tile
-          disabled
-          active-class="primary"
-          class="v-list-item v-list__tile--buy"
-          to="/upgrade"
-        />
-      </v-layout>
-    </v-img>
-  </v-navigation-drawer>
+          <v-list-tile avatar>
+            <v-list-tile-avatar color="white">
+              <v-img
+                :src="logo"
+                height="34"
+                contain
+              />
+            </v-list-tile-avatar>
+            <v-list-tile-title class="title">Numerical Analysis I</v-list-tile-title>
+          </v-list-tile>
+          <v-divider />
+          <v-list-tile
+            v-for="(link, i) in links"
+            :key="i"
+            :hre="link.to"
+            :active-class="color"
+            avatar
+            class="v-list-item"
+          >
+            <v-list-tile-action>
+              <v-icon>{{ link.icon }}</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-title v-text="link.text" />
+          </v-list-tile>
+          <v-list-tile
+            disabled
+            active-class="primary"
+            class="v-list-item v-list__tile--buy"
+            to="/upgrade"
+          />
+        </v-layout>
+      </v-img>
+    </v-navigation-drawer>
+  </v-card>
 </template>
 
 <script>
@@ -61,6 +62,7 @@ import { mapMutations, mapState } from 'vuex'
 export default {
   data: () => ({
     logo: './img/vuetifylogo.png',
+    responsive: false,
     links: [
       {
         to: '/dashboard',
@@ -73,55 +75,36 @@ export default {
         text: 'User Profile'
       },
       {
-        to: '/add-extension-worker',
-        icon: 'mdi-account-plus',
-        text: 'Add extension worker'
+        to: 'https://limits.surge.sh.surge.sh',
+        icon: 'mdi-book-open',
+        text: 'Limits'
       },
       {
-        to: '/register-farmer',
-        icon: 'mdi-account-plus',
-        text: 'Register Farmer'
+        to: 'https://ludecomposition.surge.sh',
+        icon: 'mdi-book-open',
+        text: 'LU Decomposition'
       },
       {
-        to: '/farming-methods',
-        icon: 'mdi-axe',
-        text: 'Farming methods'
+        to: 'https://polynomialinterpolation.surge.sh',
+        icon: 'mdi-book-open',
+        text: 'Polynomial Interpolation'
       },
       {
-        to: '/pest-and-diseases-control',
-        icon: 'mdi-bug',
-        text: 'Pest and Diseases control'
-      },
-      {
-        to: '/fertilizer-application',
-        icon: 'mdi-atlassian',
-        text: 'Fertilizer Application'
-      },
-      {
-        to: '/seedlings',
-        icon: 'mdi-chart-bubble',
-        text: 'Seedlings'
-      },
-      {
-        to: '/events',
-        icon: 'mdi-account-group',
-        text: 'Events'
+        to: 'https://numericalintergration.surge.sh',
+        icon: 'mdi-book-open',
+        text: 'Numerical Integration'
       }
-    ],
-    responsive: false
+    ]
   }),
   computed: {
-    ...mapState('app', ['image', 'color']),
-    inputValue: {
+    ...mapState('app', ['drawer', 'clipped', 'color']),
+    drawer: {
       get () {
         return this.$store.state.app.drawer
       },
       set (val) {
-        this.setDrawer(val)
+        this.$store.commit('app/setDrawer', val)
       }
-    },
-    items () {
-      return this.$t('Layout.View.items')
     }
   },
   mounted () {
@@ -132,7 +115,6 @@ export default {
     window.removeEventListener('resize', this.onResponsiveInverted)
   },
   methods: {
-    ...mapMutations('app', ['setDrawer', 'toggleDrawer']),
     onResponsiveInverted () {
       if (window.innerWidth < 991) {
         this.responsive = true

@@ -530,8 +530,8 @@
 </template>
 
 <script>
-import {  mdbContainer, mdbRow, mdbCol, mdbModal, mdbModalHeader,
-  mdbModalTitle, mdbModalBody, mdbBtn, mdbModalFooter} from 'mdbvue'
+import { mdbContainer, mdbRow, mdbCol, mdbModal, mdbModalHeader,
+  mdbModalTitle, mdbModalBody, mdbBtn, mdbModalFooter } from 'mdbvue'
 import Loading from 'vue-loading-overlay'
 import 'vue-loading-overlay/dist/vue-loading.css'
 import { SemipolarSpinner } from 'epic-spinners'

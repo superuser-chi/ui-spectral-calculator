@@ -8,7 +8,7 @@ let headers = {
 }
 
 export default {
-  login({
+  login ({
     commit
   }, user) {
     return new Promise((resolve, reject) => {
@@ -28,21 +28,21 @@ export default {
         )
     })
   },
-  logout({
+  logout ({
     commit
   }, cartItem) {
     axios.post('/api/auth/logout', cartItem).then(response => {
       commit('UPDATE_USER', response.data)
     })
   },
-  create_user({
+  create_user ({
     commit
   }, user) {
     axios.post('/api/extension_worker/', user).then(response => {
       console.log(response.data)
     })
   },
-  update_user({
+  update_user ({
     commit
   }, user) {
     return new Promise((resolve, reject) => {
@@ -61,7 +61,7 @@ export default {
         )
     })
   },
-  removeUser({
+  removeUser ({
     commit
   }) {
     let newUser = {

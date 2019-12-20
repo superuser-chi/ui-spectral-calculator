@@ -8,6 +8,7 @@ let headers = {
 }
 let url = 'https://pdftexapi.pythonanywhere.com/'
 // let url = 'http://127.0.0.1:5000/'
+let backend = 'http://127.0.0.1:8080/function/my-fn'
 export default {
 
   // eslint-disable-next-line space-before-function-paren
@@ -88,6 +89,26 @@ export default {
         .post('https://pdftexapi.pythonanywhere.com/generate-tutorial-tex', post, {
           responseType: 'arraybuffer'
         }, {
+          headers: headers
+        })
+        .then(
+          response => {
+            resolve(response)
+          },
+          error => {
+            reject(error)
+          }
+        )
+    })
+  },
+
+  // eslint-disable-next-line space-before-function-paren
+  getQuestionSolution({
+    commit
+  }, post) {
+    return new Promise((resolve, reject) => {
+      axios
+        .post('/faas/my-fn', post, {
           headers: headers
         })
         .then(

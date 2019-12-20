@@ -15,7 +15,7 @@ import Meta from 'vue-meta'
 // Routes
 import paths from './paths'
 
-function route(path, view, name) {
+function route (path, view, name) {
   return {
     name: name || view,
     path,
@@ -33,7 +33,7 @@ const router = new Router({
     path: '*',
     redirect: '/example'
   }]),
-  scrollBehavior(to, from, savedPosition) {
+  scrollBehavior (to, from, savedPosition) {
     if (savedPosition) {
       return savedPosition
     }
