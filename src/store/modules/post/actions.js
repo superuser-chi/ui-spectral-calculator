@@ -2,21 +2,24 @@
 // https://vuex.vuejs.org/en/actions.html
 
 import axios from 'axios'
-let headers = {
+const headers = {
   'Content-Type': 'application/json',
   'Accept': 'application/json'
 }
-let url = 'https://pdftexapi.pythonanywhere.com/'
+
+const url = 'https://pdftexapi.pythonanywhere.com/'
+const backend = 'https://faas.srv.mathsgaze.com/function'
+//const backend = 'http://127.0.0.1:8080/function'
 // let url = 'http://127.0.0.1:5000/'
-let backend = 'http://127.0.0.1:8080/function/my-fn'
+
 export default {
 
   // eslint-disable-next-line space-before-function-paren
   donwloadPdf({
+     // eslint-disable-next-line
     commit
   }, post) {
     return new Promise((resolve, reject) => {
-      console.log(post)
       axios
         .post(url + 'generate-pdf', post, {
           responseType: 'arraybuffer'
@@ -36,6 +39,7 @@ export default {
 
   // eslint-disable-next-line space-before-function-paren
   donwloadTex({
+     // eslint-disable-next-line
     commit
   }, post) {
     return new Promise((resolve, reject) => {
@@ -58,10 +62,10 @@ export default {
 
   // eslint-disable-next-line space-before-function-paren
   donwloadTutorialPdf({
+    // eslint-disable-next-line
     commit
   }, post) {
     return new Promise((resolve, reject) => {
-      console.log(post)
       axios
         .post('https://pdftexapi.pythonanywhere.com/generate-tutorial', post, {
           responseType: 'arraybuffer'
@@ -81,10 +85,10 @@ export default {
 
   // eslint-disable-next-line space-before-function-paren
   donwloadTutorialTex({
+     // eslint-disable-next-line
     commit
   }, post) {
     return new Promise((resolve, reject) => {
-      console.log(post)
       axios
         .post('https://pdftexapi.pythonanywhere.com/generate-tutorial-tex', post, {
           responseType: 'arraybuffer'
@@ -104,15 +108,18 @@ export default {
 
   // eslint-disable-next-line space-before-function-paren
   getQuestionSolution({
+     // eslint-disable-next-line
     commit
   }, post) {
     return new Promise((resolve, reject) => {
       axios
-        .post('/faas/my-fn', post, {
+        .post(`${backend}/fn-spectral-calculator`, post, {
           headers: headers
         })
         .then(
           response => {
+            // eslint-disable-next-line no-console
+            console.log(response)
             resolve(response)
           },
           error => {

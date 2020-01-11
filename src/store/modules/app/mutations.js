@@ -5,5 +5,9 @@ import {
 export default {
   setDrawer: set('drawer'),
   setImage: set('image'),
-  setColor: set('color')
+  setColor: set('color'),
+  setLoading: set('loading'),
+  setDialog: set('dialog'),
+  setMaximizedToggle: set('maximizedToggle'),
+  setMessage: set('message')
 }

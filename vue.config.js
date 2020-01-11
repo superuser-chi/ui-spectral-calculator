@@ -1,10 +1,13 @@
 module.exports = {
-  publicPath: '',
-  pwa: {
-    workboxOptions: {
-      skipWaiting: true
+  pluginOptions: {
+    quasar: {
+      importStrategy: 'kebab',
+      rtlSupport: false
     }
   },
+  transpileDependencies: [
+    'quasar'
+  ],
   devServer: {
     proxy: {
       '/api': {
@@ -25,5 +28,4 @@ module.exports = {
       }
     }
   }
-  // eslint-disable-next-line eol-last
 }
