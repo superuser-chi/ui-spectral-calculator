@@ -16,15 +16,6 @@ export default {
     toolbar,
     drawer,
     baseView
-  },
-  data() {
-    return {
-
-      
-    };
-  },
-  methods: {
-
   }
 };
 </script>

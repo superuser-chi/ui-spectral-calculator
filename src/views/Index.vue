@@ -82,6 +82,11 @@ export default {
   components: {
     VueMathjax
   },
+  metaInfo() {
+    return {
+      title: "Spectral Calculator"
+    };
+  },
   data() {
     return {
       answer: undefined,

@@ -84,11 +84,6 @@ export default {
       this.$store.commit("app/setDialog", !this.$store.state.app.dialog);
     },
   },
-  metaInfo() {
-    return {
-      title: "LU Decomposition"
-    };
-  }
 };
 </script>
 
