@@ -8,5 +8,10 @@ export default [{
   path: '/',
   name: 'index',
   view: 'Index'
+},
+{
+  path: '/videos',
+  name: 'videos',
+  view: 'Videos'
 }
 ]

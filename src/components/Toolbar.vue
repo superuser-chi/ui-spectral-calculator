@@ -13,6 +13,7 @@
 <script>
 import { QSpinnerGears } from "quasar";
 import { mapState } from "vuex";
+import router from '@/router'
 export default {
   name: "toolbar",
   data() {
@@ -89,7 +90,6 @@ export default {
         .bottomSheet({
           dark: false,
           message: "Manage Your Account",
-          style: "width: 80vw",
           grid,
           actions: [
             {
@@ -145,7 +145,11 @@ export default {
           ]
         })
         .onOk(action => {
-          this.chosen = action;
+          if(action.id === 'videos'){
+            router.push({name: 'videos'})
+            //eslint-disable-next-line no-console
+            console.log(action)
+          }
         })
         .onCancel(() => {
           // console.log('Dismissed')
