@@ -8,9 +8,8 @@ requireModule.keys().forEach(fileName => {
 
   // Replace ./ and .js
   const path = fileName.replace(/(\.\/|\.js)/g, '')
-  
+
   const [moduleName, imported] = path.split('/')
-  
 
   if (!modules[moduleName]) {
     modules[moduleName] = {
