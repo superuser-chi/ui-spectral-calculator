@@ -76,6 +76,14 @@ h2 {
   @include font-responsive(24px, 6, 420px, 348);
 }
 
+h3 {
+  @include font-responsive(18px, 6, 420px, 348);
+}
+
+h4 {
+  @include font-responsive(12px, 6, 420px, 348);
+}
+
 p {
   @include font-responsive(16px, 6, 420px, 348);
 }
