@@ -2,16 +2,9 @@
   <q-page class="row justify-center wrap">
     <q-ajax-bar ref="bar" position="bottom" color="primary" size="10px" skip-hijack />
     <q-card flat bordered class="col-xs-12 col-md-10 bg-grey-1">
-      <q-card-section>
-        <div class="text-h3 text-bold tex-italic">SQLM Solver</div>
-      </q-card-section>
-
-      <q-card-section class="flex">Prototype of the SQLM solver</q-card-section>
       <div class="q-pa-md">
         <q-card class="sub-card bg-grey-4">
-          <q-card-section>
-            <div class="text-h6">Configuration</div>
-          </q-card-section>
+
 
           <q-card-section>
             <div class="q-pa-md">
@@ -33,7 +26,7 @@
           </q-card-section>
           <q-card-actions>
             <q-btn :loading="loading" color="red" @click="simulateProgress">
-              Generate example
+              Generate Solution
               <template v-slot:loading>
                 <q-spinner-gears />
               </template>
@@ -82,7 +75,7 @@ export default {
   },
   metaInfo() {
     return {
-      title: "Spectral Calculator"
+      title: "SQLM Solver"
     };
   },
   data() {
