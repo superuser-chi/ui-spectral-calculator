@@ -8,7 +8,7 @@ const headers = {
 }
 
 const url = 'https://pdftexapi.pythonanywhere.com/'
-const backend = 'https://faas.srv.mathsgaze.com/function'
+const backend = 'http://165.22.91.250:8080/function'
 //const backend = 'http://127.0.0.1:8080/function'
 // let url = 'http://127.0.0.1:5000/'
 
